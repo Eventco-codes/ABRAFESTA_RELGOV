@@ -66,6 +66,25 @@ npm run dev
 
 Abra `http://localhost:3000` — redireciona para `/login`.
 
+## 6. Deploy em produção (Vercel)
+
+O app é um Next.js padrão (sem `vercel.json`, sem configuração especial) — o deploy zero-config da Vercel funciona direto. Reaproveita o mesmo backend Appwrite usado em DEV (não precisa provisionar `database`/tabelas de novo).
+
+1. **Appwrite Console → Project Settings → Platforms → Add Platform → Web App**: registre o domínio de produção (o `*.vercel.app` gerado, e/ou o domínio customizado se houver). Sem isso o Appwrite recusa as requisições do app publicado (checagem de origem).
+2. **Vercel → Add New Project**: importe o repositório `Eventco-codes/ABRAFESTA_RELGOV`.
+   - Branch a publicar: `feat/relgov-mvp` (o PR ainda está em draft, sem merge para `main`). Se preferir que o deploy de produção da Vercel siga `main`, faça o merge do PR primeiro — a Vercel usa a branch configurada como "Production Branch" do projeto.
+3. **Environment Variables** do projeto na Vercel — mesmos valores do `.env.local` de DEV:
+
+   ```
+   NEXT_PUBLIC_APPWRITE_ENDPOINT=https://backend.eventco.com.br/v1
+   NEXT_PUBLIC_APPWRITE_PROJECT_ID=<mesmo do DEV>
+   APPWRITE_API_KEY=<mesma key do DEV — não expor em NEXT_PUBLIC_*>
+   APPWRITE_DATABASE_ID=relgov
+   NEXT_PUBLIC_APP_URL=<preencher após o primeiro deploy, com a URL final>
+   ```
+
+4. Deploy. Depois do primeiro deploy, atualize `NEXT_PUBLIC_APP_URL` com a URL pública real e redeploy (essa var é usada para montar o link do resumo semanal por e-mail).
+
 ## Modelo de dados
 
 6 tabelas no Appwrite Database `relgov` (ver `scripts/setup-appwrite.mjs` para o schema exato): `pautas`, `encaminhamentos`, `pendencias`, `movimentacoes`, `resumos_semanais`, `email_logs`. Perfil de usuário (papel, receber alertas, última aba do painel) não é uma tabela — usa os recursos nativos do Appwrite: **Labels** (`administrador` | `coordenadorrelgov` | `leitor`) para o papel/RBAC, e **Account Preferences** para `receberAlertas`/`ultimaAbaPainel`.
