@@ -9,7 +9,7 @@ export default async function NovaPendenciaPage({
 }: {
   searchParams: Promise<{ pautaId?: string }>;
 }) {
-  await requireRole("administrador", "coordenador_relgov");
+  await requireRole("administrador", "coordenadorrelgov");
   const { pautaId } = await searchParams;
   const pautas = await buscarPautasParaSelect();
 

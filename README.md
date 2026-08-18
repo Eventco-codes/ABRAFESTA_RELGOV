@@ -68,7 +68,7 @@ Abra `http://localhost:3000` — redireciona para `/login`.
 
 ## Modelo de dados
 
-6 tabelas no Appwrite Database `relgov` (ver `scripts/setup-appwrite.mjs` para o schema exato): `pautas`, `encaminhamentos`, `pendencias`, `movimentacoes`, `resumos_semanais`, `email_logs`. Perfil de usuário (papel, receber alertas, última aba do painel) não é uma tabela — usa os recursos nativos do Appwrite: **Labels** (`administrador` | `coordenador_relgov` | `leitor`) para o papel/RBAC, e **Account Preferences** para `receberAlertas`/`ultimaAbaPainel`.
+6 tabelas no Appwrite Database `relgov` (ver `scripts/setup-appwrite.mjs` para o schema exato): `pautas`, `encaminhamentos`, `pendencias`, `movimentacoes`, `resumos_semanais`, `email_logs`. Perfil de usuário (papel, receber alertas, última aba do painel) não é uma tabela — usa os recursos nativos do Appwrite: **Labels** (`administrador` | `coordenadorrelgov` | `leitor`) para o papel/RBAC, e **Account Preferences** para `receberAlertas`/`ultimaAbaPainel`.
 
 **Pendências não têm pauta obrigatória.** No dado de origem (`scripts/data/relgov-data.json`), boa parte das pendências é acompanhamento institucional (ofícios, representação em conselhos, alinhamento entre entidades) sem uma pauta legislativa correspondente 1:1 — por isso `pendencias.pautaId` é opcional. Quando vazio, a pendência aparece como "institucional" nas telas.
 

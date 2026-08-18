@@ -126,7 +126,7 @@ export async function toggleEncaminhamento(
   encaminhamentoId: string,
   concluido: boolean
 ) {
-  const { tablesDB, user } = await requireRole("administrador", "coordenador_relgov");
+  const { tablesDB, user } = await requireRole("administrador", "coordenadorrelgov");
   await tablesDB.updateRow({
     databaseId: APPWRITE_DATABASE_ID,
     tableId: TABLES.encaminhamentos,
@@ -154,7 +154,7 @@ export async function registrarMovimentacao(
   _prev: MovimentacaoFormState,
   formData: FormData
 ): Promise<MovimentacaoFormState> {
-  const { tablesDB, user } = await requireRole("administrador", "coordenador_relgov");
+  const { tablesDB, user } = await requireRole("administrador", "coordenadorrelgov");
   const parsed = movimentacaoSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Dados inválidos." };
@@ -179,7 +179,7 @@ export async function registrarMovimentacao(
 }
 
 export async function buscarPautasParaSelect() {
-  const { tablesDB } = await requireRole("administrador", "coordenador_relgov");
+  const { tablesDB } = await requireRole("administrador", "coordenadorrelgov");
   const { rows } = await tablesDB.listRows<Pauta>({
     databaseId: APPWRITE_DATABASE_ID,
     tableId: TABLES.pautas,

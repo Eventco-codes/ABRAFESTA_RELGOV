@@ -25,7 +25,7 @@ const tablesDB = new TablesDB(client);
 
 const LABEL = {
   administrador: "administrador",
-  coordenadorRelgov: "coordenador_relgov",
+  coordenadorRelgov: "coordenadorrelgov",
   leitor: "leitor",
 };
 

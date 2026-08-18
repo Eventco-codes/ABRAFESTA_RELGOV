@@ -10,7 +10,7 @@ export default async function EmailPreviewPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const { tablesDB } = await requireRole("administrador", "coordenador_relgov");
+  const { tablesDB } = await requireRole("administrador", "coordenadorrelgov");
 
   const emailLog = await tablesDB.getRow<EmailLog>({
     databaseId: APPWRITE_DATABASE_ID,

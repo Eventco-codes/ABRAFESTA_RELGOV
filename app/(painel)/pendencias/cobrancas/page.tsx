@@ -5,7 +5,7 @@ import { listPautas, listPendencias } from "@/lib/relgov/data";
 import { diasAtraso, formatDateBR, pendenciasVencidas } from "@/lib/relgov/derived";
 
 export default async function GerarCobrancasPage() {
-  const { tablesDB } = await requireRole("administrador", "coordenador_relgov");
+  const { tablesDB } = await requireRole("administrador", "coordenadorrelgov");
   const [pendencias, pautas] = await Promise.all([listPendencias(tablesDB), listPautas(tablesDB)]);
   const tituloPorPauta = new Map(pautas.map((p) => [p.$id, p.titulo]));
   const vencidas = pendenciasVencidas(pendencias);

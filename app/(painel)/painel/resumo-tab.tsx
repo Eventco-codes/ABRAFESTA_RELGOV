@@ -20,6 +20,7 @@ interface ResumoTabProps {
     prazosVencidos: number;
   };
   cobrarEstaSemana: Pendencia[];
+  canManage: boolean;
 }
 
 export function ResumoTab({
@@ -28,6 +29,7 @@ export function ResumoTab({
   numeroSemana,
   numeros,
   cobrarEstaSemana,
+  canManage,
 }: ResumoTabProps) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px]">
@@ -112,9 +114,11 @@ export function ResumoTab({
           </>
         )}
 
-        <div className="mt-6">
-          <EnviarResumoButton />
-        </div>
+        {canManage && (
+          <div className="mt-6">
+            <EnviarResumoButton />
+          </div>
+        )}
       </aside>
     </div>
   );

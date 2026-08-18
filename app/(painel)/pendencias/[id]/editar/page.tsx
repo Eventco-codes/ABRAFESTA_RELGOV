@@ -14,7 +14,7 @@ export default async function EditarPendenciaPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const { tablesDB } = await requireRole("administrador", "coordenador_relgov");
+  const { tablesDB } = await requireRole("administrador", "coordenadorrelgov");
 
   const pendencia = await getPendencia(tablesDB, id).catch((err) => {
     if (err instanceof AppwriteException && err.code === 404) notFound();

@@ -48,14 +48,14 @@ async function garantirResumoDaSemana(
 
 /** Botão "Rodar monitoramento" — sem scraping real; garante o resumo da semana e recalcula números derivados. */
 export async function rodarMonitoramento() {
-  const { tablesDB } = await requireRole("administrador", "coordenador_relgov");
+  const { tablesDB } = await requireRole("administrador", "coordenadorrelgov");
   await garantirResumoDaSemana(tablesDB);
   revalidatePath("/painel");
 }
 
 /** Botão "Enviar resumo aos gestores" — grava um EmailLog em RASCUNHO e retorna o id para a prévia. */
 export async function enviarResumoAosGestores(): Promise<string> {
-  const { tablesDB } = await requireRole("administrador", "coordenador_relgov");
+  const { tablesDB } = await requireRole("administrador", "coordenadorrelgov");
 
   const resumo = await garantirResumoDaSemana(tablesDB);
   const [pautas, pendencias, movimentacoes] = await Promise.all([

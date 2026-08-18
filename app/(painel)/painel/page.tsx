@@ -85,6 +85,7 @@ export default async function PainelPage({
             prazosVencidos: vencidas.length,
           }}
           cobrarEstaSemana={cobrarEstaSemana}
+          canManage={canRodarMonitoramento(user.role)}
         />
       ) : (
         <IndicadoresTab

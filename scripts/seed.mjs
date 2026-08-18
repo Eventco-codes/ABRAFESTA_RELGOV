@@ -47,7 +47,7 @@ const PAUTA_MATCH = {
 
 const TEST_USERS = [
   { name: "Ana Administradora", email: "admin@relgov.local", role: "administrador" },
-  { name: "Carlos Coordenador", email: "coordenador@relgov.local", role: "coordenador_relgov" },
+  { name: "Carlos Coordenador", email: "coordenador@relgov.local", role: "coordenadorrelgov" },
   { name: "Lia Leitora", email: "leitor@relgov.local", role: "leitor" },
 ];
 const SENHA_TESTE = "RelGov#2026";

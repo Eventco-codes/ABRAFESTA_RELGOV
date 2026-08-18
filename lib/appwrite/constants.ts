@@ -13,7 +13,7 @@ export const TABLES = {
 
 export const LABELS = {
   administrador: "administrador",
-  coordenadorRelgov: "coordenador_relgov",
+  coordenadorRelgov: "coordenadorrelgov",
   leitor: "leitor",
 } as const;
 

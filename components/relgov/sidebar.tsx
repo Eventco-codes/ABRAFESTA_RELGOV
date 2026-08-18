@@ -24,7 +24,7 @@ interface SidebarProps {
 
 const ROLE_LABEL: Record<RelgovRole, string> = {
   administrador: "Administrador",
-  coordenador_relgov: "Coordenador RelGov",
+  coordenadorrelgov: "Coordenador RelGov",
   leitor: "Leitor",
 };
 

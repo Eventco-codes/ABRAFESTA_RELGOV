@@ -32,7 +32,7 @@ export async function createPendencia(
   _prev: PendenciaFormState,
   formData: FormData
 ): Promise<PendenciaFormState> {
-  const { tablesDB } = await requireRole("administrador", "coordenador_relgov");
+  const { tablesDB } = await requireRole("administrador", "coordenadorrelgov");
   const parsed = pendenciaSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Dados inválidos." };
@@ -56,7 +56,7 @@ export async function updatePendencia(
   _prev: PendenciaFormState,
   formData: FormData
 ): Promise<PendenciaFormState> {
-  const { tablesDB } = await requireRole("administrador", "coordenador_relgov");
+  const { tablesDB } = await requireRole("administrador", "coordenadorrelgov");
   const parsed = pendenciaSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Dados inválidos." };
@@ -78,7 +78,7 @@ export async function updatePendencia(
 }
 
 export async function marcarPendenciaConcluida(pendenciaId: string, pautaId: string | null) {
-  const { tablesDB } = await requireRole("administrador", "coordenador_relgov");
+  const { tablesDB } = await requireRole("administrador", "coordenadorrelgov");
   await tablesDB.updateRow({
     databaseId: APPWRITE_DATABASE_ID,
     tableId: TABLES.pendencias,

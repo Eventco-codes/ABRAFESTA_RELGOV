@@ -11,6 +11,17 @@ import type {
 } from "@/lib/types";
 
 /**
+ * As rows que o node-appwrite retorna não são objetos "plain" no sentido
+ * que o Next.js exige para atravessar a fronteira Server → Client Component
+ * (telas passam pautas/pendências/encaminhamentos direto para formulários e
+ * itens de checklist que são Client Components). Este round-trip garante um
+ * POJO de verdade.
+ */
+function toPlain<T>(value: T): T {
+  return JSON.parse(JSON.stringify(value));
+}
+
+/**
  * Carrega todas as pautas (o volume real é ~22 registros — ver relgov-data.json)
  * e deixa filtro/busca/ordenação por conta do chamador (ver lib/relgov/filters.ts).
  * Evita depender de índices compostos no Appwrite para combinações de filtro
@@ -22,15 +33,16 @@ export async function listPautas(tablesDB: TablesDB): Promise<Pauta[]> {
     tableId: TABLES.pautas,
     queries: [Query.limit(200)],
   });
-  return rows;
+  return toPlain(rows);
 }
 
 export async function getPauta(tablesDB: TablesDB, pautaId: string): Promise<Pauta> {
-  return tablesDB.getRow<Pauta>({
+  const row = await tablesDB.getRow<Pauta>({
     databaseId: APPWRITE_DATABASE_ID,
     tableId: TABLES.pautas,
     rowId: pautaId,
   });
+  return toPlain(row);
 }
 
 export async function listEncaminhamentos(
@@ -42,7 +54,7 @@ export async function listEncaminhamentos(
     tableId: TABLES.encaminhamentos,
     queries: [Query.equal("pautaId", pautaId), Query.orderAsc("ordem"), Query.limit(100)],
   });
-  return rows;
+  return toPlain(rows);
 }
 
 export async function listMovimentacoes(
@@ -54,7 +66,7 @@ export async function listMovimentacoes(
     tableId: TABLES.movimentacoes,
     queries: [Query.equal("pautaId", pautaId), Query.orderDesc("data"), Query.limit(100)],
   });
-  return rows;
+  return toPlain(rows);
 }
 
 /** Feed cross-pauta (nav "Tramitação") — últimas movimentações registradas, de qualquer pauta. */
@@ -67,15 +79,16 @@ export async function listMovimentacoesRecentes(
     tableId: TABLES.movimentacoes,
     queries: [Query.orderDesc("data"), Query.limit(limit)],
   });
-  return rows;
+  return toPlain(rows);
 }
 
 export async function getPendencia(tablesDB: TablesDB, pendenciaId: string): Promise<Pendencia> {
-  return tablesDB.getRow<Pendencia>({
+  const row = await tablesDB.getRow<Pendencia>({
     databaseId: APPWRITE_DATABASE_ID,
     tableId: TABLES.pendencias,
     rowId: pendenciaId,
   });
+  return toPlain(row);
 }
 
 export async function listPendencias(
@@ -90,7 +103,7 @@ export async function listPendencias(
     tableId: TABLES.pendencias,
     queries,
   });
-  return rows;
+  return toPlain(rows);
 }
 
 export async function listResumosSemanais(tablesDB: TablesDB): Promise<ResumoSemanal[]> {
@@ -99,7 +112,7 @@ export async function listResumosSemanais(tablesDB: TablesDB): Promise<ResumoSem
     tableId: TABLES.resumosSemanais,
     queries: [Query.orderDesc("semanaInicio"), Query.limit(20)],
   });
-  return rows;
+  return toPlain(rows);
 }
 
 export async function getResumoSemanalPorSemana(
@@ -111,7 +124,7 @@ export async function getResumoSemanalPorSemana(
     tableId: TABLES.resumosSemanais,
     queries: [Query.equal("semanaInicio", semanaInicio), Query.limit(1)],
   });
-  return rows[0] ?? null;
+  return rows[0] ? toPlain(rows[0]) : null;
 }
 
 export async function listEmailLogs(
@@ -125,5 +138,5 @@ export async function listEmailLogs(
     tableId: TABLES.emailLogs,
     queries,
   });
-  return rows;
+  return toPlain(rows);
 }

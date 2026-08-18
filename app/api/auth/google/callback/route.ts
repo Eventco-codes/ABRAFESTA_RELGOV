@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { createAnonClient, createSessionClient } from "@/lib/appwrite/server";
+import { createSessionClient } from "@/lib/appwrite/server";
+import { createTokenSessionCookie, SessionCreationError } from "@/lib/appwrite/session";
 import { SESSION_COOKIE_NAME, hasRelgovAccess } from "@/lib/appwrite/constants";
 
 export async function GET(request: NextRequest) {
@@ -12,10 +13,17 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(`${origin}/login?erro=oauth`);
   }
 
-  const { account } = createAnonClient();
-  const session = await account.createSession({ userId, secret });
+  let session;
+  try {
+    session = await createTokenSessionCookie(userId, secret);
+  } catch (err) {
+    if (err instanceof SessionCreationError) {
+      return NextResponse.redirect(`${origin}/login?erro=oauth`);
+    }
+    throw err;
+  }
 
-  const { account: sessionAccount } = createSessionClient(session.secret);
+  const { account: sessionAccount } = createSessionClient(session.value);
   const user = await sessionAccount.get();
 
   if (!hasRelgovAccess(user.labels)) {
@@ -24,7 +32,7 @@ export async function GET(request: NextRequest) {
   }
 
   const response = NextResponse.redirect(`${origin}/painel`);
-  response.cookies.set(SESSION_COOKIE_NAME, session.secret, {
+  response.cookies.set(SESSION_COOKIE_NAME, session.value, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
