@@ -1,4 +1,4 @@
-import type { Pauta } from "@/lib/types";
+import type { Movimentacao, Pauta } from "@/lib/types";
 
 export interface PautasFiltro {
   busca?: string;
@@ -38,6 +38,28 @@ export function filtrarPautas(pautas: Pauta[], filtro: PautasFiltro): Pauta[] {
 
 export function eixosDisponiveis(pautas: Pauta[]): string[] {
   return [...new Set(pautas.map((p) => p.eixo))].sort();
+}
+
+export interface MovimentacoesFiltro {
+  pautaId?: string;
+  eixo?: string;
+  origem?: string;
+}
+
+/** Eixo não existe na movimentação — resolve via a pauta a que ela pertence. */
+export function filtrarMovimentacoes(
+  movimentacoes: Movimentacao[],
+  pautas: Pauta[],
+  filtro: MovimentacoesFiltro
+): Movimentacao[] {
+  const eixoPorPauta = new Map(pautas.map((p) => [p.$id, p.eixo]));
+
+  return movimentacoes.filter((mov) => {
+    if (filtro.pautaId && mov.pautaId !== filtro.pautaId) return false;
+    if (filtro.origem && mov.origem !== filtro.origem) return false;
+    if (filtro.eixo && eixoPorPauta.get(mov.pautaId) !== filtro.eixo) return false;
+    return true;
+  });
 }
 
 export function statusDisponiveis(pautas: Pauta[]): string[] {

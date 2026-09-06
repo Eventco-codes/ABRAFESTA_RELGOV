@@ -4,19 +4,32 @@ import { PageHeader } from "@/components/relgov/page-header";
 import { requireSession } from "@/lib/auth";
 import { listMovimentacoesRecentes, listPautas } from "@/lib/relgov/data";
 import { formatDateBR } from "@/lib/relgov/derived";
+import { eixosDisponiveis, filtrarMovimentacoes } from "@/lib/relgov/filters";
+import { TramitacaoFiltros } from "./tramitacao-filtros";
 
 const ORIGEM_LABEL: Record<string, string> = {
   VARREDURA_AUTOMATICA: "Varredura automática",
   REGISTRO_MANUAL: "Registro manual",
 };
 
-export default async function TramitacaoPage() {
+export default async function TramitacaoPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | undefined>>;
+}) {
+  const params = await searchParams;
   const { tablesDB } = await requireSession();
-  const [movimentacoes, pautas] = await Promise.all([
-    listMovimentacoesRecentes(tablesDB, 60),
+  const [todasMovimentacoes, pautas] = await Promise.all([
+    listMovimentacoesRecentes(tablesDB, 200),
     listPautas(tablesDB),
   ]);
   const tituloPorPauta = new Map(pautas.map((p) => [p.$id, p.titulo]));
+
+  const movimentacoes = filtrarMovimentacoes(todasMovimentacoes, pautas, {
+    pautaId: params.pautaId,
+    eixo: params.eixo,
+    origem: params.origem,
+  });
 
   return (
     <div>
@@ -25,9 +38,20 @@ export default async function TramitacaoPage() {
         subtitle="Últimas movimentações registradas em qualquer pauta, mais recentes primeiro."
       />
       <div className="px-7 py-6">
+        <TramitacaoFiltros
+          pautas={pautas
+            .map((p) => ({ id: p.$id, titulo: p.titulo }))
+            .sort((a, b) => a.titulo.localeCompare(b.titulo))}
+          eixos={eixosDisponiveis(pautas)}
+          defaults={params}
+        />
         <ol className="flex flex-col gap-[18px] border-l border-relgov-divider pl-5">
           {movimentacoes.length === 0 && (
-            <p className="text-sm text-relgov-muted">Nenhuma movimentação registrada ainda.</p>
+            <p className="text-sm text-relgov-muted">
+              {todasMovimentacoes.length === 0
+                ? "Nenhuma movimentação registrada ainda."
+                : "Nenhuma movimentação encontrada para esse filtro."}
+            </p>
           )}
           {movimentacoes.map((mov) => (
             <li key={mov.$id} className="relative">
