@@ -15,6 +15,7 @@ import {
 import { pautasAtivas, pendenciasAbertas, pendenciasVencidas, semanaCorrente } from "@/lib/relgov/derived";
 import { gerarResumoAutomatico, movimentacoesUltimos7Dias } from "@/lib/relgov/resumo";
 import { renderWeeklyEmailHtml } from "@/lib/relgov/email-template";
+import { sendWeeklyEmail } from "@/lib/relgov/email-send";
 import type { ResumoSemanal } from "@/lib/types";
 
 export async function setPainelTab(tab: "resumo" | "indicadores") {
@@ -53,7 +54,7 @@ export async function rodarMonitoramento() {
   revalidatePath("/painel");
 }
 
-/** Botão "Enviar resumo aos gestores" — grava um EmailLog em RASCUNHO e retorna o id para a prévia. */
+/** Botão "Enviar resumo aos gestores" — grava um EmailLog, envia via Resend e atualiza o status. */
 export async function enviarResumoAosGestores(): Promise<string> {
   const { tablesDB } = await requireRole("administrador", "coordenadorrelgov");
 
@@ -93,6 +94,7 @@ export async function enviarResumoAosGestores(): Promise<string> {
     logoUrl: `${appUrl}/abrafesta-logo.png`,
   });
 
+  const assunto = `RelGov ABRAFESTA · resumo da semana`;
   const emailLog = await tablesDB.createRow({
     databaseId: APPWRITE_DATABASE_ID,
     tableId: TABLES.emailLogs,
@@ -100,10 +102,18 @@ export async function enviarResumoAosGestores(): Promise<string> {
     data: {
       resumoSemanalId: resumo.$id,
       destinatarios,
-      assunto: `RelGov ABRAFESTA · resumo da semana`,
+      assunto,
       htmlRenderizado: html,
       status: "RASCUNHO",
     },
+  });
+
+  const envio = await sendWeeklyEmail({ to: destinatarios, subject: assunto, html });
+  await tablesDB.updateRow({
+    databaseId: APPWRITE_DATABASE_ID,
+    tableId: TABLES.emailLogs,
+    rowId: emailLog.$id,
+    data: { status: envio.ok ? "ENVIADO" : "FALHA" },
   });
 
   revalidatePath("/painel");
