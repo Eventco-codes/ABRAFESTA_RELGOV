@@ -12,7 +12,7 @@ export function PageHeader({
   tabs?: ReactNode;
 }) {
   return (
-    <header className="border-b border-relgov-border bg-relgov-surface px-7 pt-5">
+    <header className="sticky top-0 z-10 border-b border-relgov-border bg-relgov-surface px-7 pt-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="font-display text-xl font-semibold text-relgov-navy">{title}</h1>

@@ -6,15 +6,29 @@ import { PrioridadePill } from "@/components/relgov/tags";
 import { requireSession } from "@/lib/auth";
 import { canManagePendencias } from "@/lib/permissions";
 import { listPautas, listPendencias } from "@/lib/relgov/data";
-import { diasAtraso, formatDateBR, isVencido, pendenciasAbertas, pendenciasVencidas } from "@/lib/relgov/derived";
+import {
+  diasAtraso,
+  formatDateBR,
+  isVencido,
+  ordenarPendencias,
+  pendenciasAbertas,
+  pendenciasVencidas,
+  type OrdenacaoPendencias,
+} from "@/lib/relgov/derived";
+import { PendenciaAcoes } from "./pendencia-acoes";
 import { PendenciasFiltro } from "./pendencias-filtro";
+
+const ORDENACOES: OrdenacaoPendencias[] = ["atraso", "prazo", "prioridade", "responsavel", "status"];
 
 export default async function PendenciasPage({
   searchParams,
 }: {
-  searchParams: Promise<{ filtro?: string }>;
+  searchParams: Promise<{ filtro?: string; ordenar?: string }>;
 }) {
-  const { filtro = "vencidas" } = await searchParams;
+  const { filtro = "vencidas", ordenar = "atraso" } = await searchParams;
+  const ordenacao = ORDENACOES.includes(ordenar as OrdenacaoPendencias)
+    ? (ordenar as OrdenacaoPendencias)
+    : "atraso";
   const { user, tablesDB } = await requireSession();
   const [pendencias, pautas] = await Promise.all([listPendencias(tablesDB), listPautas(tablesDB)]);
   const tituloPorPauta = new Map(pautas.map((p) => [p.$id, p.titulo]));
@@ -23,7 +37,7 @@ export default async function PendenciasPage({
   const vencidas = pendenciasVencidas(pendencias);
 
   const listaBase = filtro === "todas" ? pendencias : filtro === "abertas" ? abertas : vencidas;
-  const lista = [...listaBase].sort((a, b) => diasAtraso(b.prazoSugerido) - diasAtraso(a.prazoSugerido));
+  const lista = ordenarPendencias(listaBase, ordenacao);
 
   const podeGerenciar = canManagePendencias(user.role);
 
@@ -43,17 +57,25 @@ export default async function PendenciasPage({
       />
 
       <div className="px-7 py-4">
-        <PendenciasFiltro defaultValue={filtro} />
+        <PendenciasFiltro defaultValue={filtro} defaultOrdenar={ordenacao} />
 
         <div className="overflow-x-auto rounded-[9px] border border-relgov-border bg-relgov-surface">
-          <div className="grid min-w-[820px] grid-cols-[1.3fr_170px_150px_92px_118px_1fr] gap-3 border-b-2 border-relgov-border px-4 py-3">
-            {["Pauta", "Responsável", "Status", "Prioridade", "Prazo", "Próxima cobrança"].map(
-              (h) => (
-                <span key={h} className="relgov-label text-[10px] text-relgov-label">
-                  {h}
-                </span>
-              )
-            )}
+          <div
+            className={`grid min-w-[900px] ${podeGerenciar ? "grid-cols-[1.3fr_170px_150px_92px_118px_1fr_112px]" : "grid-cols-[1.3fr_170px_150px_92px_118px_1fr]"} gap-3 border-b-2 border-relgov-border px-4 py-3`}
+          >
+            {[
+              "Pauta",
+              "Responsável",
+              "Status",
+              "Prioridade",
+              "Prazo",
+              "Próxima cobrança",
+              ...(podeGerenciar ? ["Ações"] : []),
+            ].map((h) => (
+              <span key={h} className="relgov-label text-[10px] text-relgov-label">
+                {h}
+              </span>
+            ))}
           </div>
 
           {lista.length === 0 && (
@@ -64,20 +86,19 @@ export default async function PendenciasPage({
 
           {lista.map((p) => {
             const vencida = isVencido(p);
+            const titulo = p.pautaId ? (tituloPorPauta.get(p.pautaId) ?? "Pauta") : "— institucional —";
             return (
-              <Link
+              <div
                 key={p.$id}
-                href={podeGerenciar ? `/pendencias/${p.$id}/editar` : "#"}
-                className={`grid min-w-[820px] grid-cols-[1.3fr_170px_150px_92px_118px_1fr] items-center gap-3 border-b border-relgov-divider-2 px-4 py-3.5 last:border-b-0 ${vencida ? "bg-relgov-danger-bg" : ""} hover:bg-relgov-surface-subtle-2`}
+                className={`grid min-w-[900px] ${podeGerenciar ? "grid-cols-[1.3fr_170px_150px_92px_118px_1fr_112px]" : "grid-cols-[1.3fr_170px_150px_92px_118px_1fr]"} items-center gap-3 border-b border-relgov-divider-2 px-4 py-3.5 last:border-b-0 ${vencida ? "bg-relgov-danger-bg" : ""} hover:bg-relgov-surface-subtle-2`}
               >
-                <div className="min-w-0">
-                  <p className="truncate text-[13px] font-medium text-relgov-body">
-                    {p.pautaId
-                      ? (tituloPorPauta.get(p.pautaId) ?? "Pauta")
-                      : "— institucional —"}
-                  </p>
+                <Link
+                  href={podeGerenciar ? `/pendencias/${p.$id}/editar` : "#"}
+                  className={`min-w-0 ${podeGerenciar ? "" : "pointer-events-none"}`}
+                >
+                  <p className="truncate text-[13px] font-medium text-relgov-body">{titulo}</p>
                   <p className="truncate text-[11.5px] text-relgov-muted">{p.descricao}</p>
-                </div>
+                </Link>
                 <span className="truncate text-[12.5px] text-relgov-secondary">
                   {p.responsavel}
                 </span>
@@ -100,7 +121,8 @@ export default async function PendenciasPage({
                 <span className="truncate text-[12px] text-relgov-muted">
                   {p.proximaCobranca}
                 </span>
-              </Link>
+                {podeGerenciar && <PendenciaAcoes pendencia={p} tituloPauta={titulo} />}
+              </div>
             );
           })}
         </div>
