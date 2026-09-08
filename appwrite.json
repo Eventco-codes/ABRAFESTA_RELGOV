@@ -1,0 +1,24 @@
+{
+    "projectId": "6a83a090002d1ccba004",
+    "projectName": "RelGov",
+    "functions": [
+        {
+            "$id": "relgov-camara-sync",
+            "name": "RelGov · Sync Câmara",
+            "runtime": "node-18.0",
+            "entrypoint": "src/main.mjs",
+            "commands": "npm install",
+            "path": "functions/relgov-camara-sync",
+            "schedule": "0 8 * * *",
+            "timeout": 900,
+            "enabled": true,
+            "logging": true,
+            "execute": [],
+            "events": [],
+            "scopes": [
+                "databases.read",
+                "databases.write"
+            ]
+        }
+    ]
+}

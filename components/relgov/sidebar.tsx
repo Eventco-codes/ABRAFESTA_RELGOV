@@ -41,6 +41,9 @@ export function Sidebar({
     { href: "/pautas", label: "Pautas", count: pautasAtivasCount },
     { href: "/pendencias", label: "Pendências", badge: pendenciasVencidasCount },
     { href: "/tramitacao", label: "Tramitação" },
+    { href: "/deputados", label: "Deputados" },
+    { href: "/senadores", label: "Senadores" },
+    { href: "/ministerios", label: "Ministérios" },
     { href: "/relatorios", label: "Relatórios" },
     { href: "/usuarios", label: "Usuários", adminOnly: true },
   ];

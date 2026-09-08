@@ -3,6 +3,7 @@ import { SecondaryLinkButton } from "@/components/relgov/buttons";
 import { requireRole } from "@/lib/auth";
 import { listPautas, listPendencias } from "@/lib/relgov/data";
 import { diasAtraso, formatDateBR, pendenciasVencidas } from "@/lib/relgov/derived";
+import { PendenciaAcoes } from "../pendencia-acoes";
 
 export default async function GerarCobrancasPage() {
   const { tablesDB } = await requireRole("administrador", "coordenadorrelgov");
@@ -48,6 +49,27 @@ export default async function GerarCobrancasPage() {
               <p className="mt-0.5 text-[11.5px] text-relgov-muted">
                 {itens.length} pendência(s) em atraso
               </p>
+
+              <div className="mt-3 flex flex-col gap-1.5">
+                {itens.map((p) => {
+                  const titulo = p.pautaId ? (tituloPorPauta.get(p.pautaId) ?? "Pauta") : "— institucional —";
+                  return (
+                    <div
+                      key={p.$id}
+                      className="flex items-center justify-between gap-2 rounded-[7px] border border-relgov-border bg-relgov-surface-subtle px-3 py-2"
+                    >
+                      <div className="min-w-0">
+                        <p className="truncate text-[12.5px] font-medium text-relgov-body">{titulo}</p>
+                        <p className="truncate text-[11.5px] text-relgov-muted">
+                          {p.descricao} · {diasAtraso(p.prazoSugerido)}d de atraso
+                        </p>
+                      </div>
+                      <PendenciaAcoes pendencia={p} tituloPauta={titulo} />
+                    </div>
+                  );
+                })}
+              </div>
+
               <textarea
                 readOnly
                 value={texto}

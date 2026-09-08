@@ -1,4 +1,4 @@
-import { Account, Client, Databases, TablesDB, Users } from "node-appwrite";
+import { Account, Client, Databases, Storage, TablesDB, Users } from "node-appwrite";
 
 const endpoint = process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT;
 const project = process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID;
@@ -33,6 +33,7 @@ export function createSessionClient(sessionSecret: string) {
     client,
     account: new Account(client),
     tablesDB: new TablesDB(client),
+    storage: new Storage(client),
   };
 }
 
@@ -52,5 +53,6 @@ export function createAdminClient() {
     users: new Users(client),
     databases: new Databases(client),
     tablesDB: new TablesDB(client),
+    storage: new Storage(client),
   };
 }

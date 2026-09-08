@@ -117,6 +117,16 @@ export function PendenciaForm({
           className={inputClass}
         />
       </div>
+      <div>
+        <label className="relgov-label block text-[10px]">Comentário (opcional)</label>
+        <textarea
+          name="comentario"
+          defaultValue={pendencia?.comentario ?? ""}
+          rows={2}
+          placeholder="Observações rápidas da equipe sobre o andamento…"
+          className={inputClass}
+        />
+      </div>
 
       <div className="mt-2 flex gap-3">
         <PrimaryButton type="submit" disabled={pending}>

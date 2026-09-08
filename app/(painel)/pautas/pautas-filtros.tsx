@@ -12,6 +12,7 @@ interface PautasFiltrosProps {
     eixo?: string;
     status?: string;
     ativas?: string;
+    ordenar?: string;
   };
 }
 
@@ -75,6 +76,19 @@ export function PautasFiltros({ eixos, statuses, defaults }: PautasFiltrosProps)
         <option value="ativas">Ativas</option>
         <option value="desativadas">Desativadas</option>
         <option value="todas">Todas</option>
+      </select>
+      <select
+        name="ordenar"
+        defaultValue={defaults.ordenar ?? "titulo"}
+        aria-label="Ordenar por"
+        className={selectClass}
+        onChange={submit}
+      >
+        <option value="titulo">⇅ Título (A–Z)</option>
+        <option value="atualizado">⇅ Atualização recente</option>
+        <option value="prioridade">⇅ Prioridade</option>
+        <option value="eixo">⇅ Eixo (A–Z)</option>
+        <option value="status">⇅ Status (A–Z)</option>
       </select>
     </form>
   );
