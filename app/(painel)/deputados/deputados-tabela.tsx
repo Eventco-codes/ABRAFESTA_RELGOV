@@ -118,8 +118,8 @@ export function DeputadosTabela({
         }
       />
 
-      <div className="overflow-hidden rounded-[9px] border border-relgov-border bg-relgov-surface print:hidden">
-        <div className="grid grid-cols-[28px_1fr_70px_90px_130px_1fr_150px_110px] items-center gap-3 border-b-2 border-relgov-border px-4 py-3">
+      <div className="overflow-x-auto rounded-[9px] border border-relgov-border bg-relgov-surface print:hidden">
+        <div className="grid min-w-[900px] grid-cols-[28px_1fr_70px_90px_130px_1fr_150px_110px] items-center gap-3 border-b-2 border-relgov-border px-4 py-3">
           <input
             type="checkbox"
             aria-label="Selecionar todos"
@@ -161,7 +161,7 @@ export function DeputadosTabela({
         {deputados.map((dep) => (
           <div
             key={dep.$id}
-            className="grid grid-cols-[28px_1fr_70px_90px_130px_1fr_150px_110px] items-center gap-3 border-b border-relgov-divider-2 px-4 py-3.5 last:border-b-0"
+            className="grid min-w-[900px] grid-cols-[28px_1fr_70px_90px_130px_1fr_150px_110px] items-center gap-3 border-b border-relgov-divider-2 px-4 py-3.5 last:border-b-0"
           >
             <input
               type="checkbox"

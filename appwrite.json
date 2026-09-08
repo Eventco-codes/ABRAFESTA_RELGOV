@@ -5,7 +5,7 @@
         {
             "$id": "relgov-camara-sync",
             "name": "RelGov · Sync Câmara",
-            "runtime": "node-18.0",
+            "runtime": "node-20.0",
             "entrypoint": "src/main.mjs",
             "commands": "npm install",
             "path": "functions/relgov-camara-sync",
