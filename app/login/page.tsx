@@ -30,7 +30,7 @@ export default async function LoginPage({
             Monitoramento legislativo do setor de eventos
           </h2>
           <p className="mt-3 text-[13px] leading-relaxed text-white/65">
-            22 pautas acompanhadas, cobranças com prazo e resumo semanal por
+            Pautas acompanhadas, cobranças com prazo e resumo semanal por
             e-mail.
           </p>
         </div>
