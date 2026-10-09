@@ -59,6 +59,55 @@ export function PautaForm({
           defaultValue={pauta?.situacaoAtual}
         />
       </div>
+      <div className="rounded-lg border border-relgov-border bg-relgov-surface p-4">
+        <p className="text-[11px] font-semibold uppercase tracking-wide text-relgov-gold">
+          Identificação da Proposição
+        </p>
+        <div className="mt-2.5 grid grid-cols-2 gap-4">
+          <Field
+            label="Autor"
+            name="autor"
+            defaultValue={pauta?.autor ?? ""}
+            required={false}
+          />
+          <Field
+            label="Apresentação"
+            name="dataApresentacao"
+            type="date"
+            defaultValue={pauta?.dataApresentacao ?? ""}
+            required={false}
+          />
+        </div>
+        <div className="mt-4">
+          <TextAreaField
+            label="Ementa"
+            name="ementa"
+            defaultValue={pauta?.ementa ?? ""}
+            required={false}
+          />
+        </div>
+      </div>
+
+      <Field
+        label="Data da última movimentação (em tramitação)"
+        name="dataUltimaMovimentacao"
+        type="date"
+        defaultValue={pauta?.dataUltimaMovimentacao ?? ""}
+        required={false}
+      />
+
+      <div>
+        <label className="relgov-label block text-[10px]">Incluir em Tramitação?</label>
+        <select
+          name="incluirTramitacao"
+          defaultValue={pauta ? String(pauta.incluirTramitacao) : "false"}
+          className={inputClass}
+        >
+          <option value="true">Sim — mover para Tramitação e incluir no monitoramento (sincronizar)</option>
+          <option value="false">Não — manter somente em Pauta</option>
+        </select>
+      </div>
+
       <Field label="Interlocutores" name="interlocutores" defaultValue={pauta?.interlocutores} />
       <Field label="Status" name="status" defaultValue={pauta?.status} />
       <Field

@@ -1,16 +1,23 @@
 import Link from "next/link";
 
 import { PageHeader } from "@/components/relgov/page-header";
-import { PrimaryLinkButton } from "@/components/relgov/buttons";
+import { PrimaryLinkButton, SecondaryLinkButton } from "@/components/relgov/buttons";
 import { PrioridadePill, StatusTag } from "@/components/relgov/tags";
 import { requireSession } from "@/lib/auth";
 import { canManagePautas } from "@/lib/permissions";
-import { listPautas } from "@/lib/relgov/data";
+import { listPautas, purgarPautasExcluidasVencidas } from "@/lib/relgov/data";
 import { formatDateBR } from "@/lib/relgov/derived";
-import { eixosDisponiveis, filtrarPautas, statusDisponiveis } from "@/lib/relgov/filters";
+import {
+  eixosDisponiveis,
+  filtrarPautas,
+  ordenarPautas,
+  statusDisponiveis,
+  type OrdenacaoPautas,
+} from "@/lib/relgov/filters";
 import { PautasFiltros } from "./pautas-filtros";
 
 const PAGE_SIZE = 8;
+const ORDENACOES: OrdenacaoPautas[] = ["titulo", "atualizado", "prioridade", "eixo", "status"];
 
 export default async function PautasPage({
   searchParams,
@@ -18,16 +25,25 @@ export default async function PautasPage({
   searchParams: Promise<Record<string, string | undefined>>;
 }) {
   const params = await searchParams;
-  const { user, tablesDB } = await requireSession();
+  const { user, tablesDB, storage } = await requireSession();
+  if (user.role === "administrador") {
+    await purgarPautasExcluidasVencidas(tablesDB, storage);
+  }
   const pautas = await listPautas(tablesDB);
 
-  const filtradas = filtrarPautas(pautas, {
-    busca: params.busca,
-    prioridade: params.prioridade,
-    eixo: params.eixo,
-    status: params.status,
-    ativas: (params.ativas as "ativas" | "desativadas" | "todas") ?? "ativas",
-  }).sort((a, b) => a.titulo.localeCompare(b.titulo));
+  const ordenacao = ORDENACOES.includes(params.ordenar as OrdenacaoPautas)
+    ? (params.ordenar as OrdenacaoPautas)
+    : "titulo";
+  const filtradas = ordenarPautas(
+    filtrarPautas(pautas, {
+      busca: params.busca,
+      prioridade: params.prioridade,
+      eixo: params.eixo,
+      status: params.status,
+      ativas: (params.ativas as "ativas" | "desativadas" | "todas") ?? "ativas",
+    }),
+    ordenacao
+  );
 
   const pagina = Math.max(Number(params.pagina) || 1, 1);
   const totalPaginas = Math.max(Math.ceil(filtradas.length / PAGE_SIZE), 1);
@@ -41,7 +57,10 @@ export default async function PautasPage({
         subtitle={`${filtradas.length} de ${pautas.length} pautas`}
         actions={
           canManagePautas(user.role) ? (
-            <PrimaryLinkButton href="/pautas/nova">+ Nova pauta</PrimaryLinkButton>
+            <>
+              <SecondaryLinkButton href="/pautas/lixeira">Lixeira</SecondaryLinkButton>
+              <PrimaryLinkButton href="/pautas/nova">+ Nova pauta</PrimaryLinkButton>
+            </>
           ) : undefined
         }
       />

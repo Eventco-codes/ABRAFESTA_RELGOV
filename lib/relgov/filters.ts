@@ -40,6 +40,28 @@ export function eixosDisponiveis(pautas: Pauta[]): string[] {
   return [...new Set(pautas.map((p) => p.eixo))].sort();
 }
 
+export type OrdenacaoPautas = "titulo" | "atualizado" | "prioridade" | "eixo" | "status";
+
+const PESO_PRIORIDADE: Record<Pauta["prioridade"], number> = { Alta: 0, Media: 1, Baixa: 2 };
+
+/** Ordena a lista de pautas para a barra de filtro de /pautas. */
+export function ordenarPautas(pautas: Pauta[], ordenacao: OrdenacaoPautas = "titulo"): Pauta[] {
+  const lista = [...pautas];
+  switch (ordenacao) {
+    case "atualizado":
+      return lista.sort((a, b) => b.$updatedAt.localeCompare(a.$updatedAt));
+    case "prioridade":
+      return lista.sort((a, b) => PESO_PRIORIDADE[a.prioridade] - PESO_PRIORIDADE[b.prioridade]);
+    case "eixo":
+      return lista.sort((a, b) => a.eixo.localeCompare(b.eixo, "pt-BR"));
+    case "status":
+      return lista.sort((a, b) => a.status.localeCompare(b.status, "pt-BR"));
+    case "titulo":
+    default:
+      return lista.sort((a, b) => a.titulo.localeCompare(b.titulo, "pt-BR"));
+  }
+}
+
 export interface MovimentacoesFiltro {
   pautaId?: string;
   eixo?: string;
@@ -64,4 +86,13 @@ export function filtrarMovimentacoes(
 
 export function statusDisponiveis(pautas: Pauta[]): string[] {
   return [...new Set(pautas.map((p) => p.status))].sort();
+}
+
+/**
+ * A área Tramitação só lista pautas explicitamente marcadas para isso no
+ * cadastro (campo "Incluir em Tramitação" — Sim/Não). O controle é manual,
+ * feito pelo administrador/coordenador ao criar ou editar a pauta.
+ */
+export function pautasLegislativas(pautas: Pauta[]): Pauta[] {
+  return pautas.filter((p) => p.incluirTramitacao);
 }

@@ -37,6 +37,42 @@ export function pendenciasVencidas(pendencias: Pendencia[]) {
   return pendenciasAbertas(pendencias).filter((p) => isVencido(p));
 }
 
+export type OrdenacaoPendencias = "atraso" | "prazo" | "prioridade" | "responsavel" | "status";
+
+const PESO_PRIORIDADE: Record<Pendencia["prioridade"], number> = { Alta: 0, Media: 1, Baixa: 2 };
+
+/** Ordena a lista de pendências para a barra de filtro de /pendencias. */
+export function ordenarPendencias(
+  pendencias: Pendencia[],
+  ordenacao: OrdenacaoPendencias = "atraso"
+): Pendencia[] {
+  const lista = [...pendencias];
+  switch (ordenacao) {
+    case "prazo":
+      return lista.sort((a, b) => a.prazoSugerido.localeCompare(b.prazoSugerido));
+    case "prioridade":
+      return lista.sort((a, b) => PESO_PRIORIDADE[a.prioridade] - PESO_PRIORIDADE[b.prioridade]);
+    case "responsavel":
+      return lista.sort((a, b) => a.responsavel.localeCompare(b.responsavel, "pt-BR"));
+    case "status":
+      return lista.sort((a, b) => a.status.localeCompare(b.status, "pt-BR"));
+    case "atraso":
+    default:
+      return lista.sort((a, b) => diasAtraso(b.prazoSugerido) - diasAtraso(a.prazoSugerido));
+  }
+}
+
+/** Rascunho de cobrança para uma única pendência — mesmo formato usado em /pendencias/cobrancas. */
+export function montarMensagemCobranca(
+  pendencia: Pendencia,
+  tituloPauta: string
+): { assunto: string; corpo: string } {
+  const linha = `- ${tituloPauta}: ${pendencia.descricao} (prazo ${formatDateBR(pendencia.prazoSugerido)}, ${diasAtraso(pendencia.prazoSugerido)} dias de atraso). Próxima cobrança: ${pendencia.proximaCobranca}`;
+  const assunto = "RelGov ABRAFESTA · pendência em atraso";
+  const corpo = `Olá, ${pendencia.responsavel},\n\nSegue a pendência em atraso sob sua responsabilidade:\n\n${linha}\n\nAtenciosamente,\nEquipe RelGov`;
+  return { assunto, corpo };
+}
+
 /**
  * Agrupa por eixo temático (o campo "eixo" das pautas vem detalhado,
  * ex: "Trabalhista / plataformas" — aqui agrupa pela parte antes da "/"),

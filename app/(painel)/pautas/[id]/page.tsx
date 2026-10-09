@@ -6,9 +6,20 @@ import { PrioridadePill } from "@/components/relgov/tags";
 import { SecondaryLinkButton, PrimaryLinkButton } from "@/components/relgov/buttons";
 import { requireSession } from "@/lib/auth";
 import { canManagePautas, canRegistrarMovimentacao } from "@/lib/permissions";
-import { getPauta, listEncaminhamentos, listMovimentacoes, listPendencias } from "@/lib/relgov/data";
+import {
+  getPauta,
+  listAnexosPauta,
+  listAnexosPorMovimentacoes,
+  listEncaminhamentos,
+  listMovimentacoes,
+  listPendencias,
+} from "@/lib/relgov/data";
+import { anexoHref } from "@/lib/relgov/anexos";
 import { formatDateBR, isVencido } from "@/lib/relgov/derived";
+import { AnexoItem } from "./anexo-item";
+import { AnexoUploadForm } from "./anexo-upload-form";
 import { EncaminhamentoItem } from "./encaminhamento-item";
+import { ExcluirPautaButton } from "./excluir-pauta-button";
 import { MovimentacaoForm } from "./movimentacao-form";
 import { ToggleAtivoButton } from "./toggle-ativo-button";
 
@@ -30,18 +41,25 @@ export default async function FichaPautaPage({
     throw err;
   });
 
-  const [encaminhamentos, movimentacoes, pendencias] = await Promise.all([
+  const [encaminhamentos, movimentacoes, pendencias, anexosPauta] = await Promise.all([
     listEncaminhamentos(tablesDB, id),
     listMovimentacoes(tablesDB, id),
     listPendencias(tablesDB, { pautaId: id }),
+    listAnexosPauta(tablesDB, id),
   ]);
+  const anexosPorMovimentacao = await listAnexosPorMovimentacoes(
+    tablesDB,
+    movimentacoes.map((m) => m.$id)
+  );
+  const anexosDaMov = (movimentacaoId: string) =>
+    anexosPorMovimentacao.filter((a) => a.movimentacaoId === movimentacaoId);
 
   const podeGerenciarPauta = canManagePautas(user.role);
   const podeRegistrar = canRegistrarMovimentacao(user.role);
 
   return (
     <div>
-      <div className="bg-relgov-navy px-[26px] py-[22px]">
+      <div className="sticky top-0 z-10 bg-relgov-navy px-[26px] py-[22px]">
         <p className="relgov-label text-[10px] text-white/50">Pautas / {pauta.eixo}</p>
         <div className="mt-2 flex flex-wrap items-start justify-between gap-4">
           <h1 className="max-w-[640px] font-display text-[25px] font-semibold leading-[1.25] text-white">
@@ -50,6 +68,7 @@ export default async function FichaPautaPage({
           <div className="flex gap-2.5">
             {podeGerenciarPauta && (
               <>
+                <ExcluirPautaButton pautaId={pauta.$id} titulo={pauta.titulo} />
                 <ToggleAtivoButton pautaId={pauta.$id} ativo={pauta.ativo} />
                 <PrimaryLinkButton href={`/pautas/${pauta.$id}/editar`}>
                   Editar pauta
@@ -66,6 +85,11 @@ export default async function FichaPautaPage({
           {!pauta.ativo && (
             <span className="rounded-[5px] bg-white/[.14] px-2 py-0.5 text-[11px] font-medium text-white">
               Desativada
+            </span>
+          )}
+          {pauta.incluirTramitacao && (
+            <span className="rounded-[5px] bg-relgov-gold/90 px-2 py-0.5 text-[11px] font-semibold text-relgov-navy">
+              Em Tramitação
             </span>
           )}
           <span className="text-[11.5px] text-white/60">
@@ -93,6 +117,46 @@ export default async function FichaPautaPage({
               </p>
             </div>
           </div>
+
+          {(pauta.autor || pauta.dataApresentacao || pauta.ementa || pauta.dataUltimaMovimentacao) && (
+            <div className="mt-[22px] rounded-lg border border-relgov-border bg-relgov-surface p-4">
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-relgov-gold">
+                Identificação da Proposição
+              </p>
+              <div className="mt-2.5 grid grid-cols-1 gap-[18px] sm:grid-cols-2">
+                {pauta.autor && (
+                  <div>
+                    <Label>Autor</Label>
+                    <p className="mt-1 text-[13px] text-relgov-secondary">{pauta.autor}</p>
+                  </div>
+                )}
+                {pauta.dataApresentacao && (
+                  <div>
+                    <Label>Apresentação</Label>
+                    <p className="mt-1 text-[13px] text-relgov-secondary">
+                      {formatDateBR(pauta.dataApresentacao)}
+                    </p>
+                  </div>
+                )}
+              </div>
+              {pauta.ementa && (
+                <div className="mt-[18px]">
+                  <Label>Ementa</Label>
+                  <p className="mt-1 text-[13px] leading-relaxed text-relgov-secondary">
+                    {pauta.ementa}
+                  </p>
+                </div>
+              )}
+              {pauta.dataUltimaMovimentacao && (
+                <div className="mt-[18px]">
+                  <Label>Data da última movimentação (em tramitação)</Label>
+                  <p className="mt-1 text-[13px] text-relgov-secondary">
+                    {formatDateBR(pauta.dataUltimaMovimentacao)}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
 
           <div className="mt-[22px]">
             <Label>Interlocutores</Label>
@@ -139,6 +203,28 @@ export default async function FichaPautaPage({
               </a>
             )}
           </div>
+
+          <div className="mt-[22px]">
+            <Label>Documentos</Label>
+            <div className="mt-2 flex flex-col gap-2">
+              {anexosPauta.length === 0 && (
+                <p className="text-[12px] text-relgov-muted">Nenhum documento anexado.</p>
+              )}
+              {anexosPauta.map((anexo) => (
+                <AnexoItem
+                  key={anexo.$id}
+                  anexo={anexo}
+                  pautaId={pauta.$id}
+                  editable={podeRegistrar}
+                />
+              ))}
+            </div>
+            {podeRegistrar && (
+              <div className="mt-2.5 max-w-[320px]">
+                <AnexoUploadForm pautaId={pauta.$id} />
+              </div>
+            )}
+          </div>
         </div>
 
         <aside className="border-t border-relgov-border bg-relgov-surface px-5 py-[22px] lg:border-l lg:border-t-0">
@@ -157,6 +243,15 @@ export default async function FichaPautaPage({
                 </p>
                 <p className="text-[12.5px] font-medium text-relgov-body">{mov.titulo}</p>
                 <p className="text-[11.5px] text-relgov-muted">{mov.descricao}</p>
+                {anexosDaMov(mov.$id).map((anexo) => (
+                  <a
+                    key={anexo.$id}
+                    href={anexoHref(anexo)}
+                    className="mt-1 flex items-center gap-1 text-[11px] text-relgov-navy-light hover:underline"
+                  >
+                    <span aria-hidden>📎</span> {anexo.nome}
+                  </a>
+                ))}
               </li>
             ))}
           </ol>

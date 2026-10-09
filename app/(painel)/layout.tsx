@@ -16,14 +16,14 @@ export default async function PainelLayout({
   ]);
 
   return (
-    <div className="flex min-h-screen w-full bg-relgov-bg">
+    <div className="flex h-screen w-full overflow-hidden bg-relgov-bg">
       <Sidebar
         userName={user.name || user.email}
         role={user.role as RelgovRole}
         pautasAtivasCount={pautasAtivas(pautas).length}
         pendenciasVencidasCount={pendenciasVencidas(pendencias).length}
       />
-      <div className="min-w-0 flex-1">{children}</div>
+      <div className="h-full min-w-0 flex-1 overflow-y-auto">{children}</div>
     </div>
   );
 }
