@@ -39,7 +39,7 @@ function resolveMode(req) {
   return mode;
 }
 
-export default async ({ req, res, log, error }) => {
+const handler = async ({ req, res, log, error }) => {
   const started = Date.now();
   try {
     const mode = resolveMode(req);
@@ -118,3 +118,5 @@ export default async ({ req, res, log, error }) => {
     return res.json({ ok: false, error: detalhe(e), ms: Date.now() - started }, 500);
   }
 };
+
+export default handler;

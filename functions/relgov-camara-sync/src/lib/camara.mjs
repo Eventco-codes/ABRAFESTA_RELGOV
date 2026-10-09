@@ -30,7 +30,6 @@ function buildUrl(path, params = {}) {
 export async function apiGet(path, params = {}, { retries = 4, timeoutMs = 30000 } = {}) {
   const url = buildUrl(path, params);
   let attempt = 0;
-  // eslint-disable-next-line no-constant-condition
   while (true) {
     let res;
     try {
