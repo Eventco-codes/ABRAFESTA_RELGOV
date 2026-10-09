@@ -6,7 +6,7 @@ import { requireSession } from "@/lib/auth";
 import { listPautas, listPendencias } from "@/lib/relgov/data";
 import { formatDateLongBR, pautasAtivas } from "@/lib/relgov/derived";
 import { FiltroPrioridade } from "./filtro-prioridade";
-import { PrintButton } from "./print-button";
+import { BaixarPdfButton } from "./baixar-pdf-button";
 
 export default async function RelatoriosPage({
   searchParams,
@@ -29,13 +29,13 @@ export default async function RelatoriosPage({
           actions={
             <>
               <FiltroPrioridade defaultValue={apenasAlta ?? "0"} />
-              <PrintButton />
+              <BaixarPdfButton apenasAlta={apenasAlta === "1"} />
             </>
           }
         />
       </div>
 
-      <div className="mx-auto flex max-w-[820px] flex-col gap-6 px-7 py-8 print:max-w-none print:gap-0 print:px-0 print:py-0">
+      <div className="mx-auto flex max-w-[820px] flex-col gap-6 px-7 py-8 print:max-w-none print:gap-0 print:px-0 print:py-0 print:[-webkit-print-color-adjust:exact] print:[print-color-adjust:exact]">
         <section className="break-after-page rounded-lg bg-relgov-navy p-9 text-white shadow-[0_3px_14px_rgba(0,0,0,.12)] print:rounded-none print:shadow-none">
           <Image
             src="/abrafesta-logo.png"

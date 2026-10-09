@@ -23,6 +23,8 @@ import { COLLECTIONS } from './lib/schema.mjs';
 import * as S from './lib/sync.mjs';
 
 const iso = (d) => d.toISOString().slice(0, 10);
+/** "fetch failed" sozinho não diz nada — a causa real (DNS, TLS, recusa) fica em err.cause. */
+const detalhe = (e) => [e?.message, e?.cause?.code, e?.cause?.message].filter(Boolean).join(' · ');
 const num = (v, def) => (v == null || v === '' || Number.isNaN(Number(v)) ? def : Number(v));
 
 function resolveMode(req) {
@@ -41,7 +43,22 @@ export default async ({ req, res, log, error }) => {
   const started = Date.now();
   try {
     const mode = resolveMode(req);
-    const { databaseId } = getConfig();
+    const { databaseId, endpoint } = getConfig();
+
+    // Diagnóstico de rede feito de dentro do container da Function.
+    if (mode === 'diagnostico') {
+      const out = [`endpoint configurado: ${endpoint}`];
+      for (const url of [`${endpoint}/health/version`, 'https://dadosabertos.camara.leg.br/api/v2/proposicoes?itens=1']) {
+        try {
+          const r = await fetch(url, { headers: { Accept: 'application/json' } });
+          out.push(`${url} -> HTTP ${r.status}`);
+        } catch (e) {
+          out.push(`${url} -> ERRO ${detalhe(e)}`);
+        }
+      }
+      out.forEach((l) => log(l));
+      return res.json({ ok: true, mode, diag: out });
+    }
     // Prefere a chave dinâmica da Function; cai para APPWRITE_API_KEY se não houver.
     const db = makeDatabases({ apiKey: req?.headers?.['x-appwrite-key'] });
 
@@ -97,7 +114,7 @@ export default async ({ req, res, log, error }) => {
     log(`Concluído em ${(ms / 1000).toFixed(1)}s — ${JSON.stringify(ctx.stats)}`);
     return res.json({ ok: true, mode, ms, stats: ctx.stats });
   } catch (e) {
-    error(`Falha: ${e.message}`);
-    return res.json({ ok: false, error: e.message, ms: Date.now() - started }, 500);
+    error(`Falha: ${detalhe(e)}`);
+    return res.json({ ok: false, error: detalhe(e), ms: Date.now() - started }, 500);
   }
 };

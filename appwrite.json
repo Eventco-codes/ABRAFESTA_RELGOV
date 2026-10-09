@@ -17,7 +17,15 @@
             "events": [],
             "scopes": [
                 "databases.read",
-                "databases.write"
+                "databases.write",
+                "tables.read",
+                "tables.write",
+                "columns.read",
+                "columns.write",
+                "indexes.read",
+                "indexes.write",
+                "rows.read",
+                "rows.write"
             ]
         }
     ]

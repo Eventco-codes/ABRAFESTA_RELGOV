@@ -163,6 +163,20 @@ export async function listEncaminhamentos(
   return toPlain(rows);
 }
 
+/** Encaminhamentos de várias pautas de uma vez (relatório em PDF) — uma consulta em vez de N. */
+export async function listEncaminhamentosDePautas(
+  tablesDB: TablesDB,
+  pautaIds: string[]
+): Promise<Encaminhamento[]> {
+  if (pautaIds.length === 0) return [];
+  const { rows } = await tablesDB.listRows<Encaminhamento>({
+    databaseId: APPWRITE_DATABASE_ID,
+    tableId: TABLES.encaminhamentos,
+    queries: [Query.equal("pautaId", pautaIds), Query.orderAsc("ordem"), Query.limit(1000)],
+  });
+  return toPlain(rows);
+}
+
 export async function listMovimentacoes(
   tablesDB: TablesDB,
   pautaId: string
