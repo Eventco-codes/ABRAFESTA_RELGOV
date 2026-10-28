@@ -323,8 +323,7 @@
     "configFileName": "next.config.ts",
     "outputFileTracingIncludes": {
       "/api/relatorios/pdf": [
-        "./lib/relgov/pdf-assets/**/*",
-        "./public/abrafesta-logo.png"
+        "./lib/relgov/pdf-assets/**/*"
       ]
     },
     "repoRoot": "D:\\2006\\Claude\\ABRAFESTA_RELGOV\\wonderful-golick-eef338",

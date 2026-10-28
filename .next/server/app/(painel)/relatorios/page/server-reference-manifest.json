@@ -1,6 +1,6 @@
 {
   "node": {
-    "000620e09c9cd295470c1f0ca6ef5faa44db41bad1": {
+    "006a6c2d773d1ef32a279a64e1592829339161d5b5": {
       "workers": {
         "app/(painel)/relatorios/page": {
           "moduleId": 95640,
