@@ -1,6 +1,6 @@
 {
   "node": {
-    "005f9d2f5956d0ec0f83a4e372829a76bdf2c63e08": {
+    "0034ed9952dd15060df776a8ad79bc3d1887874d13": {
       "workers": {
         "app/(painel)/pautas/lixeira/page": {
           "moduleId": 87621,
@@ -11,7 +11,7 @@
       "exportedName": "logout",
       "filename": "app/login/actions.ts"
     },
-    "40355c053d232f62a8a84baf473a31bdcd0e4e4591": {
+    "406e5e498440d0ef84f611444112071655c51901b3": {
       "workers": {
         "app/(painel)/pautas/lixeira/page": {
           "moduleId": 87621,
@@ -22,7 +22,7 @@
       "exportedName": "excluirPautaAgora",
       "filename": "app/(painel)/pautas/actions.ts"
     },
-    "400d6e01dd9c45ee55cfb8c3432241d9f01b5e5717": {
+    "40ae07d65d566b5a16f3d8430540beb9563c863e0c": {
       "workers": {
         "app/(painel)/pautas/lixeira/page": {
           "moduleId": 87621,

@@ -109,6 +109,12 @@
       "namedRegex": "^/api/relatorios/pdf(?:/)?$"
     },
     {
+      "page": "/api/relatorios/pdf/pre-gerar",
+      "regex": "^/api/relatorios/pdf/pre\\-gerar(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/relatorios/pdf/pre\\-gerar(?:/)?$"
+    },
+    {
       "page": "/api/senado/sync",
       "regex": "^/api/senado/sync(?:/)?$",
       "routeKeys": {},

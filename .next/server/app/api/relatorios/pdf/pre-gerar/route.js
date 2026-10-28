@@ -1,0 +1,11 @@
+var R=require("../../../../../chunks/[turbopack]_runtime.js")("server/app/api/relatorios/pdf/pre-gerar/route.js")
+R.c("server/chunks/[externals]_fs_03t_cha._.js")
+R.c("server/chunks/_1up5m-8._.js")
+R.c("server/chunks/[root-of-the-server]__12bzftd._.js")
+R.c("server/chunks/node_modules_next_1zdbrne._.js")
+R.c("server/chunks/_1_sk83e._.js")
+R.c("server/chunks/[root-of-the-server]__00_hq9v._.js")
+R.c("server/chunks/[root-of-the-server]__13e7v_g._.js")
+R.c("server/chunks/_next-internal_server_app_api_relatorios_pdf_pre-gerar_route_actions_03gdzpm.js")
+R.m(31647)
+module.exports=R.m(31647).exports
