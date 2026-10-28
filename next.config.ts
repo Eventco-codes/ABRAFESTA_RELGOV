@@ -7,9 +7,9 @@ const cpanel = process.env.DEPLOY_TARGET === "cpanel";
 
 const nextConfig: NextConfig = {
   ...(cpanel ? { output: "standalone" as const, images: { unoptimized: true } } : {}),
-  // Fontes e logo lidos via fs pelo gerador de PDF — o rastreamento automático não os enxerga.
+  // Fontes e logos lidos via fs pelo gerador de PDF — o rastreamento automático não os enxerga.
   outputFileTracingIncludes: {
-    "/api/relatorios/pdf": ["./lib/relgov/pdf-assets/**/*", "./public/abrafesta-logo.png"],
+    "/api/relatorios/pdf": ["./lib/relgov/pdf-assets/**/*"],
   },
 };
 

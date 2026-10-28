@@ -3,7 +3,7 @@ import { NextRequest } from "next/server";
 import { requireSession } from "@/lib/auth";
 import { listEncaminhamentosDePautas, listPautas, listPendencias } from "@/lib/relgov/data";
 import { pautasAtivas } from "@/lib/relgov/derived";
-import { gerarRelatorioPdf } from "@/lib/relgov/relatorio-pdf";
+import { obterRelatorioPdf } from "@/lib/relgov/relatorio-pdf-cache";
 
 /** Relatório de acompanhamento em PDF (download). Mesmo recorte da página /relatorios. */
 export async function GET(request: NextRequest) {
@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
   );
 
   const geradoEm = new Date();
-  const pdf = await gerarRelatorioPdf({
+  const pdf = await obterRelatorioPdf({
     pautas,
     encaminhamentos,
     pendencias,

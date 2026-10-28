@@ -1,6 +1,7 @@
 /* eslint-disable jsx-a11y/alt-text -- <Image> do @react-pdf/renderer não é <img> HTML (não tem prop alt) */
 import fs from "node:fs";
 import path from "node:path";
+import { Fragment } from "react";
 import {
   Document,
   Font,
@@ -24,7 +25,18 @@ import type { Encaminhamento, Pauta, Pendencia } from "@/lib/types";
  */
 
 const ASSETS = path.join(process.cwd(), "lib/relgov/pdf-assets");
-const LOGO = path.join(process.cwd(), "public/abrafesta-logo.png");
+
+// O logo original (public/abrafesta-logo.png) tem 2000×617 com transparência: o react-pdf o
+// decodifica a cada uso e o cabeçalho fixo o repete em todas as páginas, o que dominava o custo
+// de CPU e memória. Estas versões têm ~3× a largura em que são impressas (nítidas em tela e papel).
+let logos: { capa: Buffer; cabecalho: Buffer } | null = null;
+function carregarLogos() {
+  logos ??= {
+    capa: fs.readFileSync(path.join(ASSETS, "logo-capa.png")),
+    cabecalho: fs.readFileSync(path.join(ASSETS, "logo-cabecalho.png")),
+  };
+  return logos;
+}
 
 let fontesRegistradas = false;
 function registrarFontes() {
@@ -85,7 +97,8 @@ const s = StyleSheet.create({
   kpi: { flexGrow: 1, flexBasis: 0, borderWidth: 0.8, borderColor: COR.borda, borderTopWidth: 2.5, borderTopColor: COR.gold, backgroundColor: "#ffffff", paddingVertical: 8, paddingHorizontal: 10, marginRight: 8 },
   kpiNumero: { fontFamily: "Newsreader", fontWeight: 600, fontSize: 22, lineHeight: 1.15, color: COR.navy },
   kpiRotulo: { fontSize: 7.5, lineHeight: 1.3, color: COR.mudo, marginTop: 2 },
-  eixoSumario: { fontFamily: "IBMPlexMono", fontWeight: 500, fontSize: 7.5, letterSpacing: 1.2, textTransform: "uppercase", lineHeight: 1.3, color: COR.gold, marginTop: 10, marginBottom: 4 },
+  eixoSumario: { fontFamily: "IBMPlexMono", fontWeight: 500, fontSize: 7.5, letterSpacing: 1.2, textTransform: "uppercase", lineHeight: 1.3, color: COR.gold },
+  eixoSumarioLinha: { marginTop: 10, marginBottom: 4, minHeight: 11 },
   itemSumario: { flexDirection: "row", alignItems: "flex-end", marginBottom: 3.5, minHeight: 12 },
   pautaBloco: { marginTop: 14, paddingTop: 10, borderTopWidth: 0.8, borderTopColor: COR.borda },
   pautaEixo: { fontFamily: "IBMPlexMono", fontWeight: 500, fontSize: 7.5, letterSpacing: 1.2, textTransform: "uppercase", lineHeight: 1.3, color: COR.gold },
@@ -177,7 +190,7 @@ function Relatorio({ dados, paginas, referencia }: { dados: Dados; paginas: Map<
   const abertas = pendencias.filter((p) => !p.status.toLowerCase().includes("conclu"));
   const vencidas = abertas.filter((p) => ehVencida(p, geradoEm));
   const abertasOrdenadas = [...abertas].sort((a, b) => a.prazoSugerido.localeCompare(b.prazoSugerido));
-  const logo = fs.readFileSync(LOGO);
+  const logo = carregarLogos();
   const escopo = dados.apenasAlta ? "Escopo: pautas ativas de prioridade alta" : "Escopo: todas as pautas ativas";
 
   return (
@@ -192,7 +205,7 @@ function Relatorio({ dados, paginas, referencia }: { dados: Dados; paginas: Map<
       {/* CAPA */}
       <Page size="A4" style={s.capa}>
         <View style={{ paddingTop: 70, paddingHorizontal: 56 }}>
-          <Image src={{ data: logo, format: "png" }} style={{ width: 190 }} />
+          <Image src={{ data: logo.capa, format: "png" }} style={{ width: 190 }} />
           <Text style={[s.mono, { fontSize: 8.5, color: "#ffffff", opacity: 0.65, marginTop: 10 }]}>Relações Governamentais</Text>
         </View>
         <View style={{ paddingHorizontal: 56, marginTop: 190 }}>
@@ -226,7 +239,7 @@ function Relatorio({ dados, paginas, referencia }: { dados: Dados; paginas: Map<
       {/* SÍNTESE + SUMÁRIO + CORPO */}
       <Page size="A4" style={s.pagina}>
         <View fixed style={s.cabecalho}>
-          <Image src={{ data: logo, format: "png" }} style={{ width: 92 }} />
+          <Image src={{ data: logo.cabecalho, format: "png" }} style={{ width: 92 }} />
           <Text style={[s.mono, { fontSize: 6.5, color: "#ffffff", opacity: 0.8 }]}>Relatório de acompanhamento legislativo · {referencia}</Text>
         </View>
         <View fixed style={s.cabecalhoFaixa} />
@@ -257,10 +270,14 @@ function Relatorio({ dados, paginas, referencia }: { dados: Dados; paginas: Map<
 
         <Text style={[s.mono, { fontSize: 7.5, color: COR.gold, marginTop: 6 }]}>Sumário</Text>
         {[...grupos.entries()].map(([grupo, lista]) => (
-          <View key={grupo}>
-            <Text style={s.eixoSumario}>
-              {grupo} ({lista.length})
-            </Text>
+          // Rótulo dentro de um <View> (linha como as dos itens) e sem contêiner por grupo: com <Text> solto,
+          // o react-pdf não somava a altura do rótulo e o 1º item do grupo saía por cima dele.
+          <Fragment key={grupo}>
+            <View style={s.eixoSumarioLinha}>
+              <Text style={s.eixoSumario}>
+                {grupo} ({lista.length})
+              </Text>
+            </View>
             {lista.map((p) => (
               <View key={p.$id} style={s.itemSumario}>
                   <Text style={{ fontSize: 9, lineHeight: 1.3, color: COR.gold, width: 18 }}>{numero.get(p.$id)}.</Text>
@@ -273,7 +290,7 @@ function Relatorio({ dados, paginas, referencia }: { dados: Dados; paginas: Map<
                   <Text style={{ fontSize: 9, lineHeight: 1.3, color: COR.secundario }}>{paginas.get(p.$id) ?? "—"}</Text>
               </View>
             ))}
-          </View>
+          </Fragment>
         ))}
         <View style={s.itemSumario}>
           <Text style={{ fontSize: 9, color: COR.gold, width: 18 }}>A.</Text>
