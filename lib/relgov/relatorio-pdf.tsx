@@ -413,14 +413,24 @@ function Relatorio({ dados, paginas, referencia }: { dados: Dados; paginas: Map<
   );
 }
 
+/** Tempos (ms) da última geração — expostos no Server-Timing da rota para diagnóstico. */
+export const ultimaGeracao = { fontes: 0, passe1: 0, passe2: 0 };
+
 export async function gerarRelatorioPdf(dados: Dados): Promise<Buffer> {
+  const t0 = performance.now();
   registrarFontes();
+  ultimaGeracao.fontes = Math.round(performance.now() - t0);
   const partes = new Intl.DateTimeFormat("en-CA", { timeZone: TZ, year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).formatToParts(dados.geradoEm);
   const g = (t: string) => partes.find((x) => x.type === t)?.value ?? "00";
   const ref = `RELGOV-${g("year")}${g("month")}${g("day")}-${g("hour")}${g("minute")}`;
 
   // 1ª passada descobre em que página cada pauta caiu; a 2ª imprime o sumário com esses números.
   const paginas = new Map<string, number>();
+  const t1 = performance.now();
   await renderToBuffer(<Relatorio dados={dados} paginas={paginas} referencia={ref} />);
-  return renderToBuffer(<Relatorio dados={dados} paginas={paginas} referencia={ref} />);
+  ultimaGeracao.passe1 = Math.round(performance.now() - t1);
+  const t2 = performance.now();
+  const pdf = await renderToBuffer(<Relatorio dados={dados} paginas={paginas} referencia={ref} />);
+  ultimaGeracao.passe2 = Math.round(performance.now() - t2);
+  return pdf;
 }

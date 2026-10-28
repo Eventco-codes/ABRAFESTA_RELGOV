@@ -17,7 +17,7 @@ type Dados = Parameters<typeof gerarRelatorioPdf>[0];
  *    vários cliques não empilharem CPU/memória e derrubarem o site.
  * O PDF reaproveitado mantém a data/hora de emissão da geração original: os dados são idênticos.
  */
-const VERSAO = "2"; // aumente ao mudar o layout do PDF, para descartar o cache antigo
+const VERSAO = "3"; // aumente ao mudar o layout do PDF, para descartar o cache antigo
 const MAX_EM_MEMORIA = 4;
 const VALIDADE_DISCO_MS = 3 * 24 * 60 * 60 * 1000;
 const DIR = path.join(os.tmpdir(), "relgov-pdf-cache");
