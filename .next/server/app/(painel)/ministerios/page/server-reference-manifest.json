@@ -1,0 +1,16 @@
+{
+  "node": {
+    "000620e09c9cd295470c1f0ca6ef5faa44db41bad1": {
+      "workers": {
+        "app/(painel)/ministerios/page": {
+          "moduleId": 88694,
+          "async": false,
+          "codeHash": null
+        }
+      },
+      "exportedName": "logout",
+      "filename": "app/login/actions.ts"
+    }
+  },
+  "edge": {}
+}

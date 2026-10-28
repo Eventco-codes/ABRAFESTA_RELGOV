@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "functions": {
+    "/_middleware": {
+      "runtime": "nodejs",
+      "matchers": [
+        {
+          "regexp": "^(?:\\/(_next\\/data\\/[^/]{1,}))?(?:\\/((?!_next\\/static|_next\\/image|favicon.ico|abrafesta-logo.png).*))(\\.json|\\.rsc|\\.segments\\/.+\\.segment\\.rsc)?[\\/#\\?]?$",
+          "originalSource": "/((?!_next/static|_next/image|favicon.ico|abrafesta-logo.png).*)"
+        }
+      ]
+    },
+    "/api/senado/sync": {
+      "maxDuration": 300
+    },
+    "/api/siorg/sync": {
+      "maxDuration": 300
+    }
+  }
+}

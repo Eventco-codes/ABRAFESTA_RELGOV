@@ -1,0 +1,10 @@
+var R=require("../../../../chunks/[turbopack]_runtime.js")("server/app/api/senado/sync/route.js")
+R.c("server/chunks/[root-of-the-server]__1keuhoo._.js")
+R.c("server/chunks/_1up5m-8._.js")
+R.c("server/chunks/_03-hqi9._.js")
+R.c("server/chunks/[root-of-the-server]__00_hq9v._.js")
+R.c("server/chunks/_1_sk83e._.js")
+R.c("server/chunks/node_modules_next_1zdbrne._.js")
+R.c("server/chunks/_next-internal_server_app_api_senado_sync_route_actions_1mfoc6q.js")
+R.m(58190)
+module.exports=R.m(58190).exports

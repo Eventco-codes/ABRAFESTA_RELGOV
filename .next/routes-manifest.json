@@ -1,0 +1,232 @@
+{
+  "version": 3,
+  "pages404": true,
+  "appType": "app",
+  "caseSensitive": false,
+  "basePath": "",
+  "redirects": [
+    {
+      "source": "/:path+/",
+      "destination": "/:path+",
+      "internal": true,
+      "priority": true,
+      "statusCode": 308,
+      "regex": "^(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))/$"
+    }
+  ],
+  "headers": [],
+  "onMatchHeaders": [],
+  "rewrites": {
+    "beforeFiles": [],
+    "afterFiles": [],
+    "fallback": []
+  },
+  "dynamicRoutes": [
+    {
+      "page": "/api/anexos/[fileId]",
+      "regex": "^/api/anexos/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPfileId": "nxtPfileId"
+      },
+      "namedRegex": "^/api/anexos/(?<nxtPfileId>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/ministerios/[id]",
+      "regex": "^/ministerios/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/ministerios/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/painel/email-preview/[id]",
+      "regex": "^/painel/email\\-preview/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/painel/email\\-preview/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/pautas/[id]",
+      "regex": "^/pautas/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/pautas/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/pautas/[id]/editar",
+      "regex": "^/pautas/([^/]+?)/editar(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/pautas/(?<nxtPid>[^/]+?)/editar(?:/)?$"
+    },
+    {
+      "page": "/pendencias/[id]/editar",
+      "regex": "^/pendencias/([^/]+?)/editar(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/pendencias/(?<nxtPid>[^/]+?)/editar(?:/)?$"
+    }
+  ],
+  "staticRoutes": [
+    {
+      "page": "/",
+      "regex": "^/(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/(?:/)?$"
+    },
+    {
+      "page": "/_global-error",
+      "regex": "^/_global\\-error(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_global\\-error(?:/)?$"
+    },
+    {
+      "page": "/_not-found",
+      "regex": "^/_not\\-found(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_not\\-found(?:/)?$"
+    },
+    {
+      "page": "/api/auth/google",
+      "regex": "^/api/auth/google(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/auth/google(?:/)?$"
+    },
+    {
+      "page": "/api/auth/google/callback",
+      "regex": "^/api/auth/google/callback(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/auth/google/callback(?:/)?$"
+    },
+    {
+      "page": "/api/relatorios/pdf",
+      "regex": "^/api/relatorios/pdf(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/relatorios/pdf(?:/)?$"
+    },
+    {
+      "page": "/api/senado/sync",
+      "regex": "^/api/senado/sync(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/senado/sync(?:/)?$"
+    },
+    {
+      "page": "/api/siorg/sync",
+      "regex": "^/api/siorg/sync(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/siorg/sync(?:/)?$"
+    },
+    {
+      "page": "/deputados",
+      "regex": "^/deputados(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/deputados(?:/)?$"
+    },
+    {
+      "page": "/favicon.ico",
+      "regex": "^/favicon\\.ico(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/favicon\\.ico(?:/)?$"
+    },
+    {
+      "page": "/login",
+      "regex": "^/login(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/login(?:/)?$"
+    },
+    {
+      "page": "/ministerios",
+      "regex": "^/ministerios(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/ministerios(?:/)?$"
+    },
+    {
+      "page": "/painel",
+      "regex": "^/painel(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/painel(?:/)?$"
+    },
+    {
+      "page": "/pautas",
+      "regex": "^/pautas(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/pautas(?:/)?$"
+    },
+    {
+      "page": "/pautas/lixeira",
+      "regex": "^/pautas/lixeira(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/pautas/lixeira(?:/)?$"
+    },
+    {
+      "page": "/pautas/nova",
+      "regex": "^/pautas/nova(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/pautas/nova(?:/)?$"
+    },
+    {
+      "page": "/pendencias",
+      "regex": "^/pendencias(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/pendencias(?:/)?$"
+    },
+    {
+      "page": "/pendencias/cobrancas",
+      "regex": "^/pendencias/cobrancas(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/pendencias/cobrancas(?:/)?$"
+    },
+    {
+      "page": "/pendencias/nova",
+      "regex": "^/pendencias/nova(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/pendencias/nova(?:/)?$"
+    },
+    {
+      "page": "/relatorios",
+      "regex": "^/relatorios(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/relatorios(?:/)?$"
+    },
+    {
+      "page": "/senadores",
+      "regex": "^/senadores(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/senadores(?:/)?$"
+    },
+    {
+      "page": "/tramitacao",
+      "regex": "^/tramitacao(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/tramitacao(?:/)?$"
+    },
+    {
+      "page": "/usuarios",
+      "regex": "^/usuarios(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/usuarios(?:/)?$"
+    }
+  ],
+  "dataRoutes": [],
+  "rsc": {
+    "header": "rsc",
+    "varyHeader": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+    "prefetchHeader": "next-router-prefetch",
+    "didPostponeHeader": "x-nextjs-postponed",
+    "contentTypeHeader": "text/x-component",
+    "suffix": ".rsc",
+    "prefetchSegmentHeader": "next-router-segment-prefetch",
+    "prefetchSegmentSuffix": ".segment.rsc",
+    "prefetchSegmentDirSuffix": ".segments",
+    "clientParamParsing": false,
+    "dynamicRSCPrerender": false
+  },
+  "rewriteHeaders": {
+    "pathHeader": "x-nextjs-rewritten-path",
+    "queryHeader": "x-nextjs-rewritten-query"
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "node": {
+    "000620e09c9cd295470c1f0ca6ef5faa44db41bad1": {
+      "workers": {
+        "app/(painel)/ministerios/[id]/page": {
+          "moduleId": 76031,
+          "async": false,
+          "codeHash": null
+        }
+      },
+      "exportedName": "logout",
+      "filename": "app/login/actions.ts"
+    },
+    "6037330983b17ff8b7b10bc325c1fb3ea4c6c3c786": {
+      "workers": {
+        "app/(painel)/ministerios/[id]/page": {
+          "moduleId": 76031,
+          "async": false,
+          "codeHash": null
+        }
+      },
+      "exportedName": "excluirAnexoProjeto",
+      "filename": "app/(painel)/ministerios/actions.ts"
+    },
+    "606e85622a3ebb3515cda77f58f599f755fd5349f7": {
+      "workers": {
+        "app/(painel)/ministerios/[id]/page": {
+          "moduleId": 76031,
+          "async": false,
+          "codeHash": null
+        }
+      },
+      "exportedName": "salvarDirecaoMinisterio",
+      "filename": "app/(painel)/ministerios/actions.ts"
+    },
+    "6045334ca13dcf1d5ac97353f7b45587e6dec0b6bc": {
+      "workers": {
+        "app/(painel)/ministerios/[id]/page": {
+          "moduleId": 76031,
+          "async": false,
+          "codeHash": null
+        }
+      },
+      "exportedName": "criarProjetoMinisterio",
+      "filename": "app/(painel)/ministerios/actions.ts"
+    }
+  },
+  "edge": {}
+}

@@ -1,0 +1,3 @@
+{
+  "/api/senado/sync/route": "app/api/senado/sync/route.js"
+}

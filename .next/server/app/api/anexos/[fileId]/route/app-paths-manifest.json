@@ -1,0 +1,3 @@
+{
+  "/api/anexos/[fileId]/route": "app/api/anexos/[fileId]/route.js"
+}

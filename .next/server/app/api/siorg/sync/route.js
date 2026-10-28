@@ -1,0 +1,10 @@
+var R=require("../../../../chunks/[turbopack]_runtime.js")("server/app/api/siorg/sync/route.js")
+R.c("server/chunks/[root-of-the-server]__06_a91v._.js")
+R.c("server/chunks/_1up5m-8._.js")
+R.c("server/chunks/_0h60hm6._.js")
+R.c("server/chunks/[root-of-the-server]__00_hq9v._.js")
+R.c("server/chunks/_1_sk83e._.js")
+R.c("server/chunks/node_modules_next_1zdbrne._.js")
+R.c("server/chunks/_next-internal_server_app_api_siorg_sync_route_actions_0xgnx3x.js")
+R.m(4928)
+module.exports=R.m(4928).exports

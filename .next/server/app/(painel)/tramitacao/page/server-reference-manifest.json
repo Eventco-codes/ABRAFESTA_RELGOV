@@ -1,0 +1,60 @@
+{
+  "node": {
+    "000620e09c9cd295470c1f0ca6ef5faa44db41bad1": {
+      "workers": {
+        "app/(painel)/tramitacao/page": {
+          "moduleId": 36092,
+          "async": false,
+          "codeHash": null
+        }
+      },
+      "exportedName": "logout",
+      "filename": "app/login/actions.ts"
+    },
+    "787013dc987668dec8859c0d77d745c6ce182cbfcf": {
+      "workers": {
+        "app/(painel)/tramitacao/page": {
+          "moduleId": 36092,
+          "async": false,
+          "codeHash": null
+        }
+      },
+      "exportedName": "uploadAnexoMovimentacao",
+      "filename": "app/(painel)/pautas/actions.ts"
+    },
+    "00e7051908a9f3863be3613b9ff084d4442e2cf420": {
+      "workers": {
+        "app/(painel)/tramitacao/page": {
+          "moduleId": 36092,
+          "async": false,
+          "codeHash": null
+        }
+      },
+      "exportedName": "atualizarTramitacao",
+      "filename": "app/(painel)/tramitacao/actions.ts"
+    },
+    "606727551a2256fc4f76f42439ea3ce509e1c6a87e": {
+      "workers": {
+        "app/(painel)/tramitacao/page": {
+          "moduleId": 36092,
+          "async": false,
+          "codeHash": null
+        }
+      },
+      "exportedName": "criarPautaRapida",
+      "filename": "app/(painel)/pautas/actions.ts"
+    },
+    "60e62fed14832762aa69a0bfca68f5ce0393fb606f": {
+      "workers": {
+        "app/(painel)/tramitacao/page": {
+          "moduleId": 36092,
+          "async": false,
+          "codeHash": null
+        }
+      },
+      "exportedName": "registrarMovimentacaoComPauta",
+      "filename": "app/(painel)/pautas/actions.ts"
+    }
+  },
+  "edge": {}
+}

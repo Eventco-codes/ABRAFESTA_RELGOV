@@ -1,0 +1,3 @@
+module.exports=[64281,a=>{"use strict";var b=a.i(87924);a.s(["FiltroPrioridade",0,function({defaultValue:a}){return(0,b.jsx)("form",{action:"/relatorios",onChange:a=>a.currentTarget.requestSubmit(),children:(0,b.jsxs)("select",{name:"apenasAlta",defaultValue:a,className:"rounded-[7px] border border-relgov-border-control bg-relgov-surface px-3 py-2.5 text-[13px]",children:[(0,b.jsx)("option",{value:"0",children:"Todas as prioridades"}),(0,b.jsx)("option",{value:"1",children:"Somente prioridade alta"})]})})}])}];
+
+//# sourceMappingURL=app_%28painel%29_relatorios_filtro-prioridade_tsx_1_iptmu._.js.map
