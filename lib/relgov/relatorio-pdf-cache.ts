@@ -99,11 +99,13 @@ async function pronto(k: string): Promise<Buffer | null> {
 }
 
 /** Gera (uma geração por vez), guarda em memória e disco. Pedidos iguais compartilham a promessa. */
-function produzir(k: string, dados: Dados): Promise<Buffer> {
+function produzir(k: string, dados: Dados, adiarMs = 0): Promise<Buffer> {
   const pendente = emAndamento.get(k);
   if (pendente) return pendente;
 
   const trabalho = (async () => {
+    // `adiarMs`: deixa a resposta HTTP do agendador sair antes de a geração ocupar o processo.
+    if (adiarMs > 0) await new Promise((r) => setTimeout(r, adiarMs));
     const minhaVez = fila.then(() => gerarRelatorioPdf(dados));
     fila = minhaVez.catch(() => undefined); // a fila segue mesmo se uma geração falhar
     const pdf = await minhaVez;
@@ -149,6 +151,6 @@ export async function preGerarRelatorioPdf(dados: Dados): Promise<SituacaoPreGer
   const k = chave(agendado);
   if (memoria.has(k) || (await existeNoDisco(k))) return "pronto";
   if (emAndamento.has(k)) return "em-andamento";
-  void produzir(k, agendado).catch((e) => console.error("[pdf-agendado] falha ao gerar:", e));
+  void produzir(k, agendado, 1500).catch((e) => console.error("[pdf-agendado] falha ao gerar:", e));
   return "iniciado";
 }

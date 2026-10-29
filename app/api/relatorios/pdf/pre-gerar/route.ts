@@ -30,12 +30,16 @@ async function handle(req: NextRequest) {
   try {
     const { tablesDB } = createAdminClient();
     const geradoEm = new Date();
-    const situacao: Record<string, string> = {};
 
-    for (const apenasAlta of [false, true]) {
-      const dados = await carregarDadosRelatorio(tablesDB, apenasAlta);
+    // Carrega os dois escopos ANTES de iniciar qualquer geração: gerar o PDF ocupa o único núcleo
+    // da hospedagem por dezenas de segundos e seguraria a leitura do segundo escopo (e a resposta).
+    const escopos = [false, true] as const;
+    const dados = await Promise.all(escopos.map((apenasAlta) => carregarDadosRelatorio(tablesDB, apenasAlta)));
+
+    const situacao: Record<string, string> = {};
+    for (const [i, apenasAlta] of escopos.entries()) {
       situacao[apenasAlta ? "apenasAlta" : "completo"] = await preGerarRelatorioPdf({
-        ...dados,
+        ...dados[i],
         geradoEm,
         apenasAlta,
         emitidoPor: EMITENTE_AUTOMATICO,
