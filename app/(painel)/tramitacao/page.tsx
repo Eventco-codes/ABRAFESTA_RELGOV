@@ -7,6 +7,7 @@ import { anexoHref } from "@/lib/relgov/anexos";
 import { listAnexosPorMovimentacoes, listMovimentacoesRecentes, listPautas } from "@/lib/relgov/data";
 import { formatDateBR } from "@/lib/relgov/derived";
 import { eixosDisponiveis, filtrarMovimentacoes, pautasLegislativas } from "@/lib/relgov/filters";
+import { rotuloMovimentacao } from "@/lib/relgov/movimentacao-rotulo";
 import { AnexarMovimentacaoForm } from "./anexar-movimentacao-form";
 import { AtualizarTramitacaoButton } from "./atualizar-button";
 import { CriarMovimentacaoForm } from "./criar-movimentacao-form";
@@ -94,6 +95,7 @@ export default async function TramitacaoPage({
           {movimentacoes.map((mov, indice) => {
             const linkOficial = linkPorPauta.get(mov.pautaId);
             const pautaDaMov = pautaPorId.get(mov.pautaId);
+            const rotulo = rotuloMovimentacao(mov);
             const temIdentificacao =
               pautaDaMov?.autor || pautaDaMov?.dataApresentacao || pautaDaMov?.ementa;
             return (
@@ -151,10 +153,12 @@ export default async function TramitacaoPage({
                     )}
                   </div>
                 )}
-                <p className="mt-1.5 text-[13px] font-medium text-relgov-body">{mov.titulo}</p>
-                <p className="text-[12.5px] leading-relaxed text-relgov-secondary">
-                  {mov.descricao}
-                </p>
+                <p className="mt-1.5 text-[13px] font-medium text-relgov-body">{rotulo.titulo}</p>
+                {rotulo.mostrarDescricao && (
+                  <p className="text-[12.5px] leading-relaxed text-relgov-secondary">
+                    {mov.descricao}
+                  </p>
+                )}
                 {anexosDaMov(mov.$id).map((anexo) => (
                   <a
                     key={anexo.$id}
