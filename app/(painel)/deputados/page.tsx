@@ -7,6 +7,8 @@ import {
   filtrarDeputados,
   idsDeputadosAutoresEmTramitacao,
   partidosDisponiveis,
+  SITUACAO_PADRAO,
+  situacoesDisponiveis,
   ufsDisponiveis,
 } from "@/lib/camara/filters";
 import { listPautas } from "@/lib/relgov/data";
@@ -37,10 +39,16 @@ export default async function DeputadosPage({
 
   const idsAutores = idsDeputadosAutoresEmTramitacao(deputados, pautasLegislativas(pautas));
 
+  // Sem escolha explícita, mostra só quem está em exercício (513 cadeiras); suplentes e vagas
+  // ficam a um clique em "Todas as situações".
+  const situacoes = situacoesDisponiveis(deputados);
+  const situacao = params.situacao ?? (situacoes.includes(SITUACAO_PADRAO) ? SITUACAO_PADRAO : "todas");
+
   const filtrados = filtrarDeputados(deputados, {
     busca: params.busca,
     partido: params.partido,
     uf: params.uf,
+    situacao,
   });
 
   const { campo: ordenarCampo, direcao: ordenarDirecao } = parseOrdenar(params.ordenar);
@@ -83,7 +91,8 @@ export default async function DeputadosPage({
           <DeputadosFiltros
             partidos={partidosDisponiveis(deputados)}
             ufs={ufsDisponiveis(deputados)}
-            defaults={params}
+            situacoes={situacoes}
+            defaults={{ ...params, situacao }}
           />
         </div>
 

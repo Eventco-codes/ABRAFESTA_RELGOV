@@ -115,10 +115,9 @@ export async function atualizarTramitacaoViaCamara(
       databaseId: APPWRITE_DATABASE_ID,
       tableId: TABLES.pautas,
       rowId: pauta.$id,
-      data: {
-        situacaoAtual,
-        status: status.descricaoSituacao ?? pauta.status,
-      },
+      // Só a "Situação atual" (texto da Câmara + órgão). O `status` é a classificação interna da
+      // pauta (lista fechada, definida por pessoas) e não deve ser sobrescrito pelo texto cru da API.
+      data: { situacaoAtual },
     });
 
     await tablesDB.createRow({

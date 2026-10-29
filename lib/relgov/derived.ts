@@ -1,6 +1,7 @@
 import { differenceInCalendarDays, format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
+import { eixoMae } from "@/lib/relgov/taxonomia";
 import type { Pauta, Pendencia } from "@/lib/types";
 
 export function isVencido(pendencia: Pick<Pendencia, "prazoSugerido" | "status">) {
@@ -23,6 +24,15 @@ export function formatDateLongBR(iso: string): string {
 
 export function pautasAtivas(pautas: Pauta[]) {
   return pautas.filter((p) => p.ativo);
+}
+
+/**
+ * Pautas cadastradas nos últimos `dias` dias. Usa $createdAt (data de cadastro no sistema), então
+ * a carga inicial de dados não conta como "novidade" depois da janela.
+ */
+export function pautasCadastradasRecentemente(pautas: Pauta[], dias: number) {
+  const limite = Date.now() - dias * 24 * 60 * 60 * 1000;
+  return pautas.filter((p) => new Date(p.$createdAt).getTime() >= limite);
 }
 
 export function pautasPrioridadeAlta(pautas: Pauta[]) {
@@ -74,28 +84,20 @@ export function montarMensagemCobranca(
 }
 
 /**
- * Agrupa por eixo temático (o campo "eixo" das pautas vem detalhado,
- * ex: "Trabalhista / plataformas" — aqui agrupa pela parte antes da "/"),
- * mantém os 5 maiores e soma o resto em "Outros eixos".
+ * Agrupa as pautas ativas por eixo-mãe (o campo "eixo" vem detalhado, ex.: "Trabalhista /
+ * plataformas" — ver lib/relgov/taxonomia.ts). A lista de eixos-mãe é fechada, então mostra todos.
  */
 export function distribuicaoPorEixo(pautas: Pauta[]) {
   const ativas = pautasAtivas(pautas);
   const counts = new Map<string, number>();
   for (const pauta of ativas) {
-    const bucket = pauta.eixo.split("/")[0].trim();
+    const bucket = eixoMae(pauta.eixo);
     counts.set(bucket, (counts.get(bucket) ?? 0) + 1);
   }
 
-  const ordenado = [...counts.entries()]
+  return [...counts.entries()]
     .map(([eixo, total]) => ({ eixo, total }))
     .sort((a, b) => b.total - a.total);
-
-  const TOP_N = 5;
-  if (ordenado.length <= TOP_N) return ordenado;
-
-  const principais = ordenado.slice(0, TOP_N);
-  const outros = ordenado.slice(TOP_N).reduce((acc, item) => acc + item.total, 0);
-  return [...principais, { eixo: "Outros eixos", total: outros }];
 }
 
 /** Início (segunda) e fim (domingo) da semana ISO corrente, em ISO date (yyyy-MM-dd). */

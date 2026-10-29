@@ -5,7 +5,12 @@ export interface DeputadosFiltro {
   busca?: string;
   partido?: string;
   uf?: string;
+  /** Situação na Câmara ("Exercício", "Suplência"…). "todas" ou vazio = sem filtro. */
+  situacao?: string;
 }
+
+/** Situação padrão da lista: a Câmara tem 513 cadeiras; o diretório guarda também suplentes e vagas. */
+export const SITUACAO_PADRAO = "Exercício";
 
 function normaliza(texto: string) {
   return texto
@@ -65,6 +70,7 @@ export function filtrarDeputados(deputados: Deputado[], filtro: DeputadosFiltro)
   return deputados.filter((dep) => {
     if (filtro.partido && dep.siglaPartido !== filtro.partido) return false;
     if (filtro.uf && dep.siglaUf !== filtro.uf) return false;
+    if (filtro.situacao && filtro.situacao !== "todas" && dep.situacao !== filtro.situacao) return false;
     if (busca) {
       const alvo = normaliza(`${dep.nome ?? ""} ${dep.nomeCivil ?? ""}`);
       if (!alvo.includes(busca)) return false;
@@ -75,6 +81,10 @@ export function filtrarDeputados(deputados: Deputado[], filtro: DeputadosFiltro)
 
 export function partidosDisponiveis(deputados: Deputado[]): string[] {
   return [...new Set(deputados.map((d) => d.siglaPartido).filter((v): v is string => Boolean(v)))].sort();
+}
+
+export function situacoesDisponiveis(deputados: Deputado[]): string[] {
+  return [...new Set(deputados.map((d) => d.situacao).filter((v): v is string => Boolean(v)))].sort();
 }
 
 export function ufsDisponiveis(deputados: Deputado[]): string[] {

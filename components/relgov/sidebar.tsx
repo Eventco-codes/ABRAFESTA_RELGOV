@@ -91,7 +91,11 @@ export function Sidebar({
                   </span>
                 )}
                 {typeof item.badge === "number" && item.badge > 0 && (
-                  <span className="rounded-[9px] bg-[#b3382c] px-1.5 py-0.5 font-mono text-[10px] font-semibold text-white">
+                  <span
+                    title={`${item.badge} ${item.badge === 1 ? "vencida" : "vencidas"}`}
+                    aria-label={`${item.badge} ${item.badge === 1 ? "vencida" : "vencidas"}`}
+                    className="rounded-[9px] bg-[#b3382c] px-1.5 py-0.5 font-mono text-[10px] font-semibold text-white"
+                  >
                     {item.badge}
                   </span>
                 )}

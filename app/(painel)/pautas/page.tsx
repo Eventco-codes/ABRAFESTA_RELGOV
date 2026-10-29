@@ -7,6 +7,7 @@ import { requireSession } from "@/lib/auth";
 import { canManagePautas } from "@/lib/permissions";
 import { listPautas, purgarPautasExcluidasVencidas } from "@/lib/relgov/data";
 import { formatDateBR } from "@/lib/relgov/derived";
+import { eixoNormalizado, statusCanonico } from "@/lib/relgov/taxonomia";
 import {
   eixosDisponiveis,
   filtrarPautas,
@@ -101,12 +102,14 @@ export default async function PautasPage({
                   {pauta.interlocutores}
                 </p>
               </div>
-              <span className="truncate text-[12.5px] text-relgov-secondary">{pauta.eixo}</span>
+              <span className="truncate text-[12.5px] text-relgov-secondary">
+                {eixoNormalizado(pauta.eixo)}
+              </span>
               <span>
                 <PrioridadePill prioridade={pauta.prioridade} />
               </span>
               <span>
-                <StatusTag status={pauta.status} />
+                <StatusTag status={statusCanonico(pauta.status)} />
               </span>
               <span className="text-[12px] text-relgov-muted">
                 {formatDateBR(pauta.$updatedAt)}

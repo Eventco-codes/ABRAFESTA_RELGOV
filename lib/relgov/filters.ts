@@ -1,3 +1,4 @@
+import { EIXOS_MAE, EIXO_OUTROS, STATUS_PAUTA, eixoMae, statusCanonico } from "@/lib/relgov/taxonomia";
 import type { Movimentacao, Pauta } from "@/lib/types";
 
 export interface PautasFiltro {
@@ -24,8 +25,9 @@ export function filtrarPautas(pautas: Pauta[], filtro: PautasFiltro): Pauta[] {
     if (ativas === "ativas" && !pauta.ativo) return false;
     if (ativas === "desativadas" && pauta.ativo) return false;
     if (filtro.prioridade && pauta.prioridade !== filtro.prioridade) return false;
-    if (filtro.eixo && pauta.eixo !== filtro.eixo) return false;
-    if (filtro.status && pauta.status !== filtro.status) return false;
+    // Eixo e status filtram pelo valor canônico: funciona com os dados antigos (texto livre) e com os normalizados.
+    if (filtro.eixo && eixoMae(pauta.eixo) !== filtro.eixo) return false;
+    if (filtro.status && statusCanonico(pauta.status) !== filtro.status) return false;
     if (busca) {
       const alvo = normaliza(
         `${pauta.titulo} ${pauta.eixo} ${pauta.interlocutores} ${pauta.situacaoAtual}`
@@ -36,8 +38,10 @@ export function filtrarPautas(pautas: Pauta[], filtro: PautasFiltro): Pauta[] {
   });
 }
 
+/** Eixos-mãe que têm pautas (na ordem da lista fechada; "Outros eixos" só se algum valor não mapear). */
 export function eixosDisponiveis(pautas: Pauta[]): string[] {
-  return [...new Set(pautas.map((p) => p.eixo))].sort();
+  const presentes = new Set(pautas.map((p) => eixoMae(p.eixo)));
+  return [...EIXOS_MAE, EIXO_OUTROS].filter((e) => presentes.has(e));
 }
 
 export type OrdenacaoPautas = "titulo" | "atualizado" | "prioridade" | "eixo" | "status";
@@ -55,7 +59,10 @@ export function ordenarPautas(pautas: Pauta[], ordenacao: OrdenacaoPautas = "tit
     case "eixo":
       return lista.sort((a, b) => a.eixo.localeCompare(b.eixo, "pt-BR"));
     case "status":
-      return lista.sort((a, b) => a.status.localeCompare(b.status, "pt-BR"));
+      return lista.sort(
+        (a, b) =>
+          STATUS_PAUTA.indexOf(statusCanonico(a.status)) - STATUS_PAUTA.indexOf(statusCanonico(b.status))
+      );
     case "titulo":
     default:
       return lista.sort((a, b) => a.titulo.localeCompare(b.titulo, "pt-BR"));
@@ -74,7 +81,7 @@ export function filtrarMovimentacoes(
   pautas: Pauta[],
   filtro: MovimentacoesFiltro
 ): Movimentacao[] {
-  const eixoPorPauta = new Map(pautas.map((p) => [p.$id, p.eixo]));
+  const eixoPorPauta = new Map(pautas.map((p) => [p.$id, eixoMae(p.eixo)]));
 
   return movimentacoes.filter((mov) => {
     if (filtro.pautaId && mov.pautaId !== filtro.pautaId) return false;
@@ -84,8 +91,10 @@ export function filtrarMovimentacoes(
   });
 }
 
+/** Status canônicos que têm pautas, na ordem do ciclo de vida. */
 export function statusDisponiveis(pautas: Pauta[]): string[] {
-  return [...new Set(pautas.map((p) => p.status))].sort();
+  const presentes = new Set(pautas.map((p) => statusCanonico(p.status)));
+  return STATUS_PAUTA.filter((s) => presentes.has(s));
 }
 
 /**

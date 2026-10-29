@@ -5,6 +5,7 @@ import { useActionState, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { PrimaryButton, SecondaryButton } from "@/components/relgov/buttons";
+import { EIXOS_MAE } from "@/lib/relgov/taxonomia";
 import {
   criarPautaRapida,
   registrarMovimentacaoComPauta,
@@ -214,7 +215,16 @@ function NovaPautaForm({ onClose }: { onClose: () => void }) {
         </p>
       )}
       <input name="pautaTitulo" placeholder="Título da pauta (ex.: PL 1234/2026 — …)" required className={inputClass} />
-      <input name="pautaEixo" placeholder="Eixo (ex.: Trabalhista / jornada de trabalho)" required className={inputClass} />
+      <select name="pautaEixo" required defaultValue="" className={inputClass}>
+        <option value="" disabled>
+          Eixo…
+        </option>
+        {EIXOS_MAE.map((eixo) => (
+          <option key={eixo} value={eixo}>
+            {eixo}
+          </option>
+        ))}
+      </select>
       <input
         name="pautaLinkOficial"
         type="url"

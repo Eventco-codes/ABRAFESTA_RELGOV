@@ -7,7 +7,7 @@ import type { Pendencia } from "@/lib/types";
 interface IndicadoresTabProps {
   kpis: {
     pautasAtivas: number;
-    pautasNovas2026: number;
+    pautasRecentes: number;
     prioridadeAlta: number;
     percentualAlta: number;
     pendenciasAbertas: number;
@@ -37,7 +37,7 @@ export function IndicadoresTab({
           href="/pautas?ativas=ativas"
           label="Pautas ativas"
           valor={kpis.pautasAtivas}
-          nota={`${kpis.pautasNovas2026} novas em 2026`}
+          nota={`${kpis.pautasRecentes} cadastradas nos últimos 30 dias`}
         />
         <KpiCard
           href="/pautas?prioridade=Alta"
@@ -66,7 +66,7 @@ export function IndicadoresTab({
           <div className="mt-3 flex flex-col gap-2.5">
             {distribuicaoEixo.map((item, index) => (
               <div key={item.eixo} className="flex items-center gap-2.5">
-                <span className="w-[150px] shrink-0 text-[12.5px] text-relgov-tag-blue-text">
+                <span className="w-[190px] shrink-0 text-[12.5px] text-relgov-tag-blue-text">
                   {item.eixo}
                 </span>
                 <span className="h-[15px] flex-1 overflow-hidden rounded-[4px] bg-relgov-divider">

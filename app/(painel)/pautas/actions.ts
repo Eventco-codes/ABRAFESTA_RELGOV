@@ -7,12 +7,17 @@ import { z } from "zod";
 
 import { APPWRITE_DATABASE_ID, STORAGE_BUCKET_ID, TABLES } from "@/lib/appwrite/constants";
 import { requireRole } from "@/lib/auth";
-import { excluirPautaDefinitivamente } from "@/lib/relgov/data";
+import { excluirPautaDefinitivamente, getPauta } from "@/lib/relgov/data";
+import { EIXOS_MAE, STATUS_PADRAO, STATUS_PAUTA, montarEixo, statusCanonico } from "@/lib/relgov/taxonomia";
 import type { Pauta } from "@/lib/types";
+
+const eixoMaeSchema = z.enum(EIXOS_MAE as [string, ...string[]], { message: "Escolha o eixo da lista." });
 
 const pautaSchema = z.object({
   titulo: z.string().min(3, "Informe o título."),
-  eixo: z.string().min(2, "Informe o eixo."),
+  // Eixo = lista fechada (eixo-mãe) + subeixo livre; é gravado junto, em `eixo`, como "Mãe / sub".
+  eixoMae: eixoMaeSchema,
+  subeixo: z.string().optional(),
   atuacao: z.string().min(3, "Informe a atuação."),
   contexto: z.string().min(3, "Informe o contexto."),
   situacaoAtual: z.string().min(3, "Informe a situação atual."),
@@ -51,7 +56,10 @@ export async function createPauta(
     return { error: parsed.error.issues[0]?.message ?? "Dados inválidos." };
   }
 
-  const { proximosEncaminhamentos, incluirTramitacao, ...pautaData } = parsed.data;
+  const { proximosEncaminhamentos, incluirTramitacao, eixoMae, subeixo, ...pautaData } = parsed.data;
+  if (!(STATUS_PAUTA as readonly string[]).includes(pautaData.status)) {
+    return { error: "Escolha o status da lista." };
+  }
   const pautaId = ID.unique();
 
   await tablesDB.createRow({
@@ -60,6 +68,7 @@ export async function createPauta(
     rowId: pautaId,
     data: {
       ...pautaData,
+      eixo: montarEixo(eixoMae, subeixo),
       linkOficial: pautaData.linkOficial || null,
       autor: pautaData.autor || null,
       dataApresentacao: pautaData.dataApresentacao || null,
@@ -113,12 +122,29 @@ export async function updatePauta(
     return { error: parsed.error.issues[0]?.message ?? "Dados inválidos." };
   }
 
+  const { eixoMae, subeixo, ...dados } = parsed.data;
+  const atual = await getPauta(tablesDB, pautaId);
+
+  // Status: lista fechada. Pautas antigas podem manter o valor que já tinham até alguém reclassificá-las.
+  if (!(STATUS_PAUTA as readonly string[]).includes(dados.status) && dados.status !== atual.status) {
+    return { error: "Escolha o status da lista." };
+  }
+  // Mudou o status? A "Situação atual" precisa ser revisada junto — status e texto contraditórios
+  // na mesma pauta (ex.: "Sancionada" com situação "texto-base na Câmara") já aconteceram.
+  if (
+    statusCanonico(dados.status) !== statusCanonico(atual.status) &&
+    dados.situacaoAtual.trim() === atual.situacaoAtual.trim()
+  ) {
+    return { error: "Você mudou o status: revise e atualize a “Situação atual” antes de salvar." };
+  }
+
   await tablesDB.updateRow({
     databaseId: APPWRITE_DATABASE_ID,
     tableId: TABLES.pautas,
     rowId: pautaId,
     data: {
-      ...parsed.data,
+      ...dados,
+      eixo: montarEixo(eixoMae, subeixo),
       linkOficial: parsed.data.linkOficial || null,
       autor: parsed.data.autor || null,
       dataApresentacao: parsed.data.dataApresentacao || null,
@@ -220,6 +246,25 @@ export async function registrarMovimentacao(
   }
 
   const criadoPorNome = user.name || user.email;
+
+  // Clique duplo / reenvio do formulário: o mesmo registro (pauta + título + descrição) nos
+  // últimos 10 minutos é tratado como repetição, não como nova movimentação.
+  const { rows: recentes } = await tablesDB.listRows({
+    databaseId: APPWRITE_DATABASE_ID,
+    tableId: TABLES.movimentacoes,
+    queries: [Query.equal("pautaId", pautaId), Query.orderDesc("data"), Query.limit(10)],
+  });
+  const limiteRepeticao = Date.now() - 10 * 60 * 1000;
+  const repetida = recentes.some(
+    (m) =>
+      m.titulo === parsed.data.titulo &&
+      m.descricao === parsed.data.descricao &&
+      new Date(m.$createdAt).getTime() >= limiteRepeticao
+  );
+  if (repetida) {
+    return { error: "Esta movimentação já foi registrada há poucos minutos." };
+  }
+
   const movimentacaoId = ID.unique();
   await tablesDB.createRow({
     databaseId: APPWRITE_DATABASE_ID,
@@ -272,7 +317,7 @@ export async function registrarMovimentacaoComPauta(
 
 const novaPautaRapidaSchema = z.object({
   pautaTitulo: z.string().min(3, "Informe o título da pauta."),
-  pautaEixo: z.string().min(2, "Informe o eixo."),
+  pautaEixo: eixoMaeSchema,
   pautaLinkOficial: z.string().url().optional().or(z.literal("")),
   movTitulo: z.string().optional(),
   movDescricao: z.string().optional(),
@@ -309,7 +354,7 @@ export async function criarPautaRapida(
       situacaoAtual: "Em acompanhamento inicial.",
       interlocutores: "A definir",
       prioridade: "Media",
-      status: "Em acompanhamento",
+      status: STATUS_PADRAO,
       fonteReferencia: "Cadastrado via Tramitação",
       linkOficial: parsed.data.pautaLinkOficial || null,
       incluirTramitacao: true,

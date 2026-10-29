@@ -16,6 +16,7 @@ import {
 } from "@/lib/relgov/data";
 import { anexoHref } from "@/lib/relgov/anexos";
 import { formatDateBR, isVencido } from "@/lib/relgov/derived";
+import { eixoNormalizado, statusCanonico } from "@/lib/relgov/taxonomia";
 import { AnexoItem } from "./anexo-item";
 import { AnexoUploadForm } from "./anexo-upload-form";
 import { EncaminhamentoItem } from "./encaminhamento-item";
@@ -60,7 +61,7 @@ export default async function FichaPautaPage({
   return (
     <div>
       <div className="sticky top-0 z-10 bg-relgov-navy px-[26px] py-[22px]">
-        <p className="relgov-label text-[10px] text-white/50">Pautas / {pauta.eixo}</p>
+        <p className="relgov-label text-[10px] text-white/50">Pautas / {eixoNormalizado(pauta.eixo)}</p>
         <div className="mt-2 flex flex-wrap items-start justify-between gap-4">
           <h1 className="max-w-[640px] font-display text-[25px] font-semibold leading-[1.25] text-white">
             {pauta.titulo}
@@ -80,7 +81,7 @@ export default async function FichaPautaPage({
         <div className="mt-3 flex flex-wrap items-center gap-2.5">
           <PrioridadePill prioridade={pauta.prioridade} />
           <span className="rounded-[5px] bg-white/[.14] px-2 py-0.5 text-[11px] font-medium text-white">
-            {pauta.status}
+            {statusCanonico(pauta.status)}
           </span>
           {!pauta.ativo && (
             <span className="rounded-[5px] bg-white/[.14] px-2 py-0.5 text-[11px] font-medium text-white">

@@ -47,6 +47,29 @@ export default async function MinisteriosPage({
     }))
   );
 
+  // Natureza/Categoria vêm do SIORG e podem não ter sido preenchidas na sincronização: uma coluna
+  // 100% vazia ("—" em todas as linhas) só ocupa espaço, então ela some até haver dado.
+  const temNatureza = comSubordinadas.some(
+    ({ ministerio }) => ministerio.naturezaRef && naturezaPorId.get(ministerio.naturezaRef)
+  );
+  const temCategoria = comSubordinadas.some(
+    ({ ministerio }) => ministerio.categoriaRef && categoriaPorId.get(ministerio.categoriaRef)
+  );
+  const colunas = [
+    "1fr",
+    "110px",
+    ...(temNatureza ? ["1fr"] : []),
+    ...(temCategoria ? ["1fr"] : []),
+    "140px",
+  ].join(" ");
+  const cabecalhos = [
+    "Ministério",
+    "Sigla",
+    ...(temNatureza ? ["Natureza jurídica"] : []),
+    ...(temCategoria ? ["Categoria"] : []),
+    "Unidades subordinadas",
+  ];
+
   return (
     <div>
       <PageHeader
@@ -66,14 +89,15 @@ export default async function MinisteriosPage({
         <MinisteriosFiltros defaults={params} />
 
         <div className="overflow-hidden rounded-[9px] border border-relgov-border bg-relgov-surface">
-          <div className="grid grid-cols-[1fr_110px_1fr_1fr_140px] gap-3 border-b-2 border-relgov-border px-4 py-3">
-            {["Ministério", "Sigla", "Natureza jurídica", "Categoria", "Unidades subordinadas"].map(
-              (h) => (
-                <span key={h} className="relgov-label text-[10px] text-relgov-label">
-                  {h}
-                </span>
-              )
-            )}
+          <div
+            style={{ gridTemplateColumns: colunas }}
+            className="grid gap-3 border-b-2 border-relgov-border px-4 py-3"
+          >
+            {cabecalhos.map((h) => (
+              <span key={h} className="relgov-label text-[10px] text-relgov-label">
+                {h}
+              </span>
+            ))}
           </div>
 
           {comSubordinadas.length === 0 && (
@@ -86,18 +110,23 @@ export default async function MinisteriosPage({
             <Link
               key={ministerio.$id}
               href={`/ministerios/${ministerio.$id}`}
-              className="grid grid-cols-[1fr_110px_1fr_1fr_140px] items-center gap-3 border-b border-relgov-divider-2 px-4 py-3.5 last:border-b-0 hover:bg-relgov-surface-subtle-2"
+              style={{ gridTemplateColumns: colunas }}
+              className="grid items-center gap-3 border-b border-relgov-divider-2 px-4 py-3.5 last:border-b-0 hover:bg-relgov-surface-subtle-2"
             >
               <p className="truncate text-[13.5px] font-semibold text-relgov-navy">
                 {ministerio.nome}
               </p>
               <span className="text-[12.5px] text-relgov-secondary">{ministerio.sigla ?? "—"}</span>
-              <span className="truncate text-[12.5px] text-relgov-secondary">
-                {(ministerio.naturezaRef && naturezaPorId.get(ministerio.naturezaRef)) ?? "—"}
-              </span>
-              <span className="truncate text-[12.5px] text-relgov-secondary">
-                {(ministerio.categoriaRef && categoriaPorId.get(ministerio.categoriaRef)) ?? "—"}
-              </span>
+              {temNatureza && (
+                <span className="truncate text-[12.5px] text-relgov-secondary">
+                  {(ministerio.naturezaRef && naturezaPorId.get(ministerio.naturezaRef)) ?? "—"}
+                </span>
+              )}
+              {temCategoria && (
+                <span className="truncate text-[12.5px] text-relgov-secondary">
+                  {(ministerio.categoriaRef && categoriaPorId.get(ministerio.categoriaRef)) ?? "—"}
+                </span>
+              )}
               <span className="font-mono text-[12.5px] text-relgov-muted">{subordinadas}</span>
             </Link>
           ))}

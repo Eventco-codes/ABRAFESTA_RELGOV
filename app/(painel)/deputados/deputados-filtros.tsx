@@ -6,17 +6,19 @@ import { useRef } from "react";
 interface DeputadosFiltrosProps {
   partidos: string[];
   ufs: string[];
+  situacoes: string[];
   defaults: {
     busca?: string;
     partido?: string;
     uf?: string;
+    situacao?: string;
   };
 }
 
 const selectClass =
   "rounded-[7px] border border-relgov-border-control bg-relgov-surface px-3 py-2.5 text-[13px] text-relgov-body outline-none";
 
-export function DeputadosFiltros({ partidos, ufs, defaults }: DeputadosFiltrosProps) {
+export function DeputadosFiltros({ partidos, ufs, situacoes, defaults }: DeputadosFiltrosProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const formRef = useRef<HTMLFormElement>(null);
@@ -65,6 +67,20 @@ export function DeputadosFiltros({ partidos, ufs, defaults }: DeputadosFiltrosPr
         {ufs.map((uf) => (
           <option key={uf} value={uf}>
             {uf}
+          </option>
+        ))}
+      </select>
+      <select
+        name="situacao"
+        aria-label="Situação"
+        defaultValue={defaults.situacao ?? "todas"}
+        className={selectClass}
+        onChange={submit}
+      >
+        <option value="todas">Todas as situações</option>
+        {situacoes.map((situacao) => (
+          <option key={situacao} value={situacao}>
+            {situacao}
           </option>
         ))}
       </select>

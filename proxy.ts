@@ -2,12 +2,21 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { SESSION_COOKIE_NAME } from "@/lib/appwrite/constants";
 
-// /api/siorg/sync, /api/senado/sync e /api/relatorios/pdf/pre-gerar têm autenticação própria
-// por segredo (x-siorg-sync-secret / x-senado-sync-secret / x-pdf-cron-secret) — chamadas por
-// agendadores, sem cookie de sessão do RelGov. Só essas rotas ficam públicas — qualquer outra
-// rota futura sob /api/siorg, /api/senado ou /api/relatorios deve continuar exigindo sessão
-// por padrão (/api/relatorios/pdf, o download, exige).
-const PUBLIC_PATHS = ["/login", "/api/auth", "/api/siorg/sync", "/api/senado/sync", "/api/relatorios/pdf/pre-gerar"];
+// /api/siorg/sync, /api/senado/sync, /api/relatorios/pdf/pre-gerar e /api/monitoramento/semanal
+// têm autenticação própria por segredo (x-siorg-sync-secret / x-senado-sync-secret /
+// x-pdf-cron-secret / x-monitoramento-secret) — chamadas por agendadores, sem cookie de sessão do
+// RelGov. Só essas rotas ficam públicas — qualquer outra rota futura sob /api/siorg, /api/senado,
+// /api/relatorios ou /api/monitoramento deve continuar exigindo sessão por padrão
+// (/api/relatorios/pdf, o download, exige).
+const PUBLIC_PATHS = [
+  "/login",
+  "/robots.txt",
+  "/api/auth",
+  "/api/siorg/sync",
+  "/api/senado/sync",
+  "/api/relatorios/pdf/pre-gerar",
+  "/api/monitoramento/semanal",
+];
 
 function isPublicPath(pathname: string) {
   return PUBLIC_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`));
