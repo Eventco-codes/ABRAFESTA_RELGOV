@@ -13,6 +13,7 @@ import {
 import {
   distribuicaoPorEixo,
   pautasAtivas,
+  pautasCadastradasRecentemente,
   pautasPrioridadeAlta,
   pendenciasAbertas,
   pendenciasVencidas,
@@ -91,7 +92,8 @@ export default async function PainelPage({
         <IndicadoresTab
           kpis={{
             pautasAtivas: ativas.length,
-            pautasNovas2026: ativas.filter((p) => p.$createdAt.startsWith("2026")).length,
+            // Antes: "novas em 2026" por $createdAt — a carga inicial (ago/2026) fazia todas parecerem novas.
+            pautasRecentes: pautasCadastradasRecentemente(ativas, 30).length,
             prioridadeAlta: prioridadeAlta.length,
             percentualAlta: ativas.length
               ? Math.round((prioridadeAlta.length / ativas.length) * 100)

@@ -48,6 +48,15 @@ export function MovimentacaoForm({ pautaId }: { pautaId: string }) {
         rows={3}
         className="rounded-[7px] border border-relgov-border-control bg-relgov-surface px-3 py-2 text-[12.5px] outline-none focus:border-relgov-navy"
       />
+      <div>
+        <label className="relgov-label block text-[10px]">Anexar documento (opcional)</label>
+        <input
+          type="file"
+          name="arquivo"
+          accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png"
+          className="mt-1 w-full rounded-[7px] border border-relgov-border-control bg-relgov-surface px-3 py-2 text-[12px] outline-none file:mr-2 file:rounded-[5px] file:border-0 file:bg-relgov-surface-subtle file:px-2 file:py-1 file:text-[11.5px]"
+        />
+      </div>
       <div className="flex gap-2">
         <PrimaryButton type="submit" disabled={pending} className="flex-1">
           {pending ? "Salvando…" : "Salvar"}

@@ -45,12 +45,12 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```sh
 npm install
 npm run setup:appwrite   # cria database, tabelas, colunas, índices e permissões por Label
-npm run seed              # carrega as 22 pautas / 12 pendências reais + 3 usuários de teste
+SEED_CONFIRMAR=sim npm run seed   # carrega as 22 pautas / 12 pendências reais + 3 usuários de teste
 ```
 
-`npm run setup:appwrite` é idempotente (roda de novo sem duplicar). `npm run seed` cria linhas novas a cada execução — rode uma vez por instância limpa.
+`npm run setup:appwrite` é idempotente (roda de novo sem duplicar). `npm run seed` cria linhas novas a cada execução — rode uma vez por instância limpa **e só em ambiente de desenvolvimento descartável**: ele cria um administrador de teste e exige `SEED_CONFIRMAR=sim`.
 
-Usuários de teste criados pelo seed (senha `RelGov#2026`):
+Usuários de teste criados pelo seed. A senha **não** fica no repositório: defina `SEED_SENHA` (mín. 12 caracteres) ou use a senha aleatória que o script mostra no final. Nunca rode o seed em produção.
 
 | E-mail | Papel |
 |---|---|

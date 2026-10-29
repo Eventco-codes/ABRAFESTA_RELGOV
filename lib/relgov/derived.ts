@@ -1,6 +1,7 @@
 import { differenceInCalendarDays, format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
+import { eixoMae } from "@/lib/relgov/taxonomia";
 import type { Pauta, Pendencia } from "@/lib/types";
 
 export function isVencido(pendencia: Pick<Pendencia, "prazoSugerido" | "status">) {
@@ -25,6 +26,15 @@ export function pautasAtivas(pautas: Pauta[]) {
   return pautas.filter((p) => p.ativo);
 }
 
+/**
+ * Pautas cadastradas nos últimos `dias` dias. Usa $createdAt (data de cadastro no sistema), então
+ * a carga inicial de dados não conta como "novidade" depois da janela.
+ */
+export function pautasCadastradasRecentemente(pautas: Pauta[], dias: number) {
+  const limite = Date.now() - dias * 24 * 60 * 60 * 1000;
+  return pautas.filter((p) => new Date(p.$createdAt).getTime() >= limite);
+}
+
 export function pautasPrioridadeAlta(pautas: Pauta[]) {
   return pautasAtivas(pautas).filter((p) => p.prioridade === "Alta");
 }
@@ -37,29 +47,57 @@ export function pendenciasVencidas(pendencias: Pendencia[]) {
   return pendenciasAbertas(pendencias).filter((p) => isVencido(p));
 }
 
+export type OrdenacaoPendencias = "atraso" | "prazo" | "prioridade" | "responsavel" | "status";
+
+const PESO_PRIORIDADE: Record<Pendencia["prioridade"], number> = { Alta: 0, Media: 1, Baixa: 2 };
+
+/** Ordena a lista de pendências para a barra de filtro de /pendencias. */
+export function ordenarPendencias(
+  pendencias: Pendencia[],
+  ordenacao: OrdenacaoPendencias = "atraso"
+): Pendencia[] {
+  const lista = [...pendencias];
+  switch (ordenacao) {
+    case "prazo":
+      return lista.sort((a, b) => a.prazoSugerido.localeCompare(b.prazoSugerido));
+    case "prioridade":
+      return lista.sort((a, b) => PESO_PRIORIDADE[a.prioridade] - PESO_PRIORIDADE[b.prioridade]);
+    case "responsavel":
+      return lista.sort((a, b) => a.responsavel.localeCompare(b.responsavel, "pt-BR"));
+    case "status":
+      return lista.sort((a, b) => a.status.localeCompare(b.status, "pt-BR"));
+    case "atraso":
+    default:
+      return lista.sort((a, b) => diasAtraso(b.prazoSugerido) - diasAtraso(a.prazoSugerido));
+  }
+}
+
+/** Rascunho de cobrança para uma única pendência — mesmo formato usado em /pendencias/cobrancas. */
+export function montarMensagemCobranca(
+  pendencia: Pendencia,
+  tituloPauta: string
+): { assunto: string; corpo: string } {
+  const linha = `- ${tituloPauta}: ${pendencia.descricao} (prazo ${formatDateBR(pendencia.prazoSugerido)}, ${diasAtraso(pendencia.prazoSugerido)} dias de atraso). Próxima cobrança: ${pendencia.proximaCobranca}`;
+  const assunto = "RelGov ABRAFESTA · pendência em atraso";
+  const corpo = `Olá, ${pendencia.responsavel},\n\nSegue a pendência em atraso sob sua responsabilidade:\n\n${linha}\n\nAtenciosamente,\nEquipe RelGov`;
+  return { assunto, corpo };
+}
+
 /**
- * Agrupa por eixo temático (o campo "eixo" das pautas vem detalhado,
- * ex: "Trabalhista / plataformas" — aqui agrupa pela parte antes da "/"),
- * mantém os 5 maiores e soma o resto em "Outros eixos".
+ * Agrupa as pautas ativas por eixo-mãe (o campo "eixo" vem detalhado, ex.: "Trabalhista /
+ * plataformas" — ver lib/relgov/taxonomia.ts). A lista de eixos-mãe é fechada, então mostra todos.
  */
 export function distribuicaoPorEixo(pautas: Pauta[]) {
   const ativas = pautasAtivas(pautas);
   const counts = new Map<string, number>();
   for (const pauta of ativas) {
-    const bucket = pauta.eixo.split("/")[0].trim();
+    const bucket = eixoMae(pauta.eixo);
     counts.set(bucket, (counts.get(bucket) ?? 0) + 1);
   }
 
-  const ordenado = [...counts.entries()]
+  return [...counts.entries()]
     .map(([eixo, total]) => ({ eixo, total }))
     .sort((a, b) => b.total - a.total);
-
-  const TOP_N = 5;
-  if (ordenado.length <= TOP_N) return ordenado;
-
-  const principais = ordenado.slice(0, TOP_N);
-  const outros = ordenado.slice(TOP_N).reduce((acc, item) => acc + item.total, 0);
-  return [...principais, { eixo: "Outros eixos", total: outros }];
 }
 
 /** Início (segunda) e fim (domingo) da semana ISO corrente, em ISO date (yyyy-MM-dd). */

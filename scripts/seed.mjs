@@ -5,12 +5,14 @@
  * 3 usuários de teste para validar o RBAC (Administrador, Coordenador
  * RelGov, Leitor).
  *
- * Rodar depois de scripts/setup-appwrite.mjs:
- *   node --env-file=.env.local scripts/seed.mjs
+ * Rodar depois de scripts/setup-appwrite.mjs, SÓ em ambiente de desenvolvimento descartável:
+ *   SEED_CONFIRMAR=sim node --env-file=.env.local scripts/seed.mjs
+ * (opcional: SEED_SENHA=<12+ caracteres>; sem ela, uma senha aleatória é gerada e mostrada no fim)
  *
  * Idempotente na parte de schema, mas cria linhas NOVAS a cada execução
  * (não faz upsert por título) — rode uma vez por ambiente/instância limpa.
  */
+import { randomBytes } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
@@ -50,7 +52,22 @@ const TEST_USERS = [
   { name: "Carlos Coordenador", email: "coordenador@relgov.local", role: "coordenadorrelgov" },
   { name: "Lia Leitora", email: "leitor@relgov.local", role: "leitor" },
 ];
-const SENHA_TESTE = "RelGov#2026";
+// A senha não fica no repositório: vem de SEED_SENHA (mín. 12 caracteres) ou é gerada a cada
+// execução e mostrada uma única vez no fim. As contas são de TESTE, com papel de administrador
+// — por isso o script só roda com confirmação explícita e nunca deve apontar para produção.
+const SENHA_TESTE = process.env.SEED_SENHA || randomBytes(12).toString("base64url");
+
+if (process.env.SEED_SENHA && process.env.SEED_SENHA.length < 12) {
+  console.error("SEED_SENHA precisa ter pelo menos 12 caracteres.");
+  process.exit(1);
+}
+if (process.env.SEED_CONFIRMAR !== "sim") {
+  console.error(
+    "Este script cria usuários de teste (um deles administrador) e dados de exemplo.\n" +
+      "Rode só em ambiente de desenvolvimento descartável, com SEED_CONFIRMAR=sim."
+  );
+  process.exit(1);
+}
 
 async function main() {
   console.log(`Seeding ${data.projetos.length} pautas e ${data.pendencias.length} pendências…\n`);
@@ -157,7 +174,11 @@ async function main() {
     }
   }
 
-  console.log(`\nPronto. Login de teste (senha "${SENHA_TESTE}"):`);
+  console.log(
+    process.env.SEED_SENHA
+      ? "\nPronto. Login de teste (senha = SEED_SENHA):"
+      : `\nPronto. Login de teste (senha gerada, não será exibida de novo: ${SENHA_TESTE}):`
+  );
   for (const u of TEST_USERS) console.log(`  ${u.email} — ${u.role}`);
 }
 

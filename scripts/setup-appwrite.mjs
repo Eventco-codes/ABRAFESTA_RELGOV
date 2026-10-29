@@ -12,7 +12,7 @@
  *
  * Idempotente: pode rodar de novo — recursos já existentes são pulados (409).
  */
-import { Client, Databases, TablesDB, Permission, Role } from "node-appwrite";
+import { Client, Databases, Storage, TablesDB, Permission, Role, Query } from "node-appwrite";
 
 const endpoint = requireEnv("NEXT_PUBLIC_APPWRITE_ENDPOINT");
 const project = requireEnv("NEXT_PUBLIC_APPWRITE_PROJECT_ID");
@@ -22,6 +22,7 @@ const databaseId = process.env.APPWRITE_DATABASE_ID || "relgov";
 const client = new Client().setEndpoint(endpoint).setProject(project).setKey(apiKey);
 const databases = new Databases(client);
 const tablesDB = new TablesDB(client);
+const storage = new Storage(client);
 
 const LABEL = {
   administrador: "administrador",
@@ -67,8 +68,20 @@ const TABLES = [
       { type: "string", key: "status", size: 255, required: true },
       { type: "string", key: "linkOficial", size: 500, required: false },
       { type: "boolean", key: "ativo", required: true, xdefault: true },
+      // Identificação da Proposição (dados formais, quando a pauta for uma proposição oficial)
+      { type: "string", key: "autor", size: 255, required: false },
+      { type: "string", key: "dataApresentacao", size: 10, required: false },
+      { type: "string", key: "ementa", size: 2000, required: false },
+      { type: "string", key: "dataUltimaMovimentacao", size: 10, required: false },
+      // Controle manual de Tramitação + soft delete (30 dias)
+      { type: "boolean", key: "incluirTramitacao", required: true, xdefault: false },
+      { type: "datetime", key: "excluidoEm", required: false },
     ],
-    indexes: [{ key: "idx_ativo", type: "key", columns: ["ativo"] }],
+    indexes: [
+      { key: "idx_ativo", type: "key", columns: ["ativo"] },
+      { key: "idx_incluirTramitacao", type: "key", columns: ["incluirTramitacao"] },
+      { key: "idx_excluidoEm", type: "key", columns: ["excluidoEm"] },
+    ],
   },
   {
     id: "encaminhamentos",
@@ -102,6 +115,7 @@ const TABLES = [
       { type: "string", key: "prazoSugerido", size: 10, required: true },
       { type: "string", key: "evidencia", size: 500, required: false },
       { type: "string", key: "observacoes", size: 2000, required: false },
+      { type: "string", key: "comentario", size: 2000, required: false },
     ],
     indexes: [
       { key: "idx_pautaId", type: "key", columns: ["pautaId"] },
@@ -143,6 +157,98 @@ const TABLES = [
     indexes: [{ key: "idx_semanaInicio", type: "key", columns: ["semanaInicio"] }],
   },
   {
+    id: "anexos",
+    name: "Anexos",
+    permissions: [...READ_TODOS, ...ESCRITA_ADMIN_COORDENADOR],
+    columns: [
+      { type: "string", key: "pautaId", size: 36, required: true },
+      { type: "string", key: "movimentacaoId", size: 36, required: false },
+      { type: "string", key: "fileId", size: 36, required: true },
+      { type: "string", key: "nome", size: 255, required: true },
+      { type: "integer", key: "tamanho", required: true },
+      { type: "string", key: "tipoMime", size: 120, required: false },
+      { type: "string", key: "criadoPorNome", size: 255, required: false },
+    ],
+    indexes: [
+      { key: "idx_pautaId", type: "key", columns: ["pautaId"] },
+      { key: "idx_movimentacaoId", type: "key", columns: ["movimentacaoId"] },
+    ],
+  },
+  {
+    id: "pendencia_anexos",
+    name: "Pendências · Anexos",
+    permissions: [...READ_TODOS, ...ESCRITA_ADMIN_COORDENADOR],
+    columns: [
+      { type: "string", key: "pendenciaId", size: 36, required: true },
+      { type: "string", key: "fileId", size: 36, required: true },
+      { type: "string", key: "nome", size: 255, required: true },
+      { type: "integer", key: "tamanho", required: true },
+      { type: "string", key: "tipoMime", size: 120, required: false },
+      { type: "string", key: "criadoPorNome", size: 255, required: false },
+    ],
+    indexes: [{ key: "idx_pendenciaId", type: "key", columns: ["pendenciaId"] }],
+  },
+  {
+    id: "ministerio_projetos",
+    name: "Ministério · Projetos",
+    permissions: [...READ_TODOS, ...ESCRITA_ADMIN_COORDENADOR],
+    columns: [
+      { type: "string", key: "ministerioId", size: 64, required: true },
+      { type: "string", key: "ministerioNome", size: 255, required: true },
+      { type: "string", key: "titulo", size: 255, required: true },
+      { type: "string", key: "data", size: 10, required: false },
+      { type: "string", key: "contexto", size: 2000, required: false },
+      { type: "string", key: "link", size: 500, required: false },
+      { type: "string", key: "criadoPorNome", size: 255, required: false },
+    ],
+    indexes: [{ key: "idx_ministerioId", type: "key", columns: ["ministerioId"] }],
+  },
+  {
+    id: "ministerio_projeto_responsaveis",
+    name: "Ministério · Projeto · Responsáveis",
+    permissions: [...READ_TODOS, ...ESCRITA_ADMIN_COORDENADOR],
+    columns: [
+      { type: "string", key: "projetoId", size: 36, required: true },
+      { type: "string", key: "nome", size: 255, required: true },
+      { type: "string", key: "telefone", size: 32, required: false },
+      { type: "string", key: "email", size: 254, required: false },
+    ],
+    indexes: [{ key: "idx_projetoId", type: "key", columns: ["projetoId"] }],
+  },
+  {
+    id: "ministerio_projeto_anexos",
+    name: "Ministério · Projeto · Anexos",
+    permissions: [...READ_TODOS, ...ESCRITA_ADMIN_COORDENADOR],
+    columns: [
+      { type: "string", key: "projetoId", size: 36, required: true },
+      { type: "string", key: "fileId", size: 36, required: true },
+      { type: "string", key: "nome", size: 255, required: true },
+      { type: "integer", key: "tamanho", required: true },
+      { type: "string", key: "tipoMime", size: 120, required: false },
+      { type: "string", key: "criadoPorNome", size: 255, required: false },
+    ],
+    indexes: [{ key: "idx_projetoId", type: "key", columns: ["projetoId"] }],
+  },
+  {
+    // rowId = ministerioId (1 registro por ministério). O SIORG confirma que o
+    // cargo existe (Ministro de Estado / Chefe de Gabinete), mas não devolve o
+    // nome de quem ocupa (nomeTitular vem sempre null na API pública) — por
+    // isso esse contato é mantido manualmente pela equipe RelGov.
+    id: "ministerio_direcao",
+    name: "Ministério · Direção",
+    permissions: [...READ_TODOS, ...ESCRITA_ADMIN_COORDENADOR],
+    columns: [
+      { type: "string", key: "ministroNome", size: 255, required: false },
+      { type: "string", key: "ministroTelefone", size: 32, required: false },
+      { type: "string", key: "ministroEmail", size: 254, required: false },
+      { type: "string", key: "chefeGabineteNome", size: 255, required: false },
+      { type: "string", key: "chefeGabineteTelefone", size: 32, required: false },
+      { type: "string", key: "chefeGabineteEmail", size: 254, required: false },
+      { type: "string", key: "atualizadoPorNome", size: 255, required: false },
+    ],
+    indexes: [],
+  },
+  {
     id: "email_logs",
     name: "Email logs",
     permissions: [
@@ -168,6 +274,20 @@ async function main() {
 
   await ignore409(() => databases.create({ databaseId, name: "RelGov" }), "database relgov");
 
+  const BUCKET_ID = "documentos";
+  await ignore409(
+    () =>
+      storage.createBucket({
+        bucketId: BUCKET_ID,
+        name: "Documentos",
+        permissions: [...READ_TODOS, ...ESCRITA_ADMIN_COORDENADOR],
+        fileSecurity: false,
+        maximumFileSize: 15 * 1024 * 1024,
+        allowedFileExtensions: ["pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "jpg", "jpeg", "png"],
+      }),
+    `bucket ${BUCKET_ID}`
+  );
+
   for (const table of TABLES) {
     await ignore409(
       () =>
@@ -189,6 +309,12 @@ async function main() {
       await waitColumnReady(table.id, column.key);
     }
 
+    // Colunas required não aceitam default no Appwrite — então uma coluna
+    // required nova, numa tabela já populada, some (não vira null) nas linhas
+    // existentes. Backfilla o xdefault declarado nelas para o script continuar
+    // seguro de re-rodar contra uma tabela com dados.
+    await backfillRequiredDefaults(table);
+
     for (const index of table.indexes) {
       await ignore409(
         () =>
@@ -205,6 +331,34 @@ async function main() {
   }
 
   console.log("\nSchema provisionado. Próximo passo: node --env-file=.env.local scripts/seed.mjs");
+}
+
+/** Preenche o xdefault declarado nas linhas já existentes que não têm a coluna (required nunca recebe default do Appwrite em si). */
+async function backfillRequiredDefaults(table) {
+  const alvo = table.columns.filter((c) => c.required && c.xdefault !== undefined);
+  if (alvo.length === 0) return;
+
+  let cursor;
+  for (;;) {
+    const queries = [Query.limit(100)];
+    if (cursor) queries.push(Query.cursorAfter(cursor));
+    const { rows } = await tablesDB.listRows({ databaseId, tableId: table.id, queries });
+    if (rows.length === 0) break;
+
+    for (const row of rows) {
+      const faltando = {};
+      for (const c of alvo) {
+        if (row[c.key] === undefined || row[c.key] === null) faltando[c.key] = c.xdefault;
+      }
+      if (Object.keys(faltando).length > 0) {
+        await tablesDB.updateRow({ databaseId, tableId: table.id, rowId: row.$id, data: faltando });
+        console.log(`  ↺ backfill ${table.id}/${row.$id}: ${Object.keys(faltando).join(", ")}`);
+      }
+    }
+
+    if (rows.length < 100) break;
+    cursor = rows[rows.length - 1].$id;
+  }
 }
 
 function createColumn(tableId, column) {

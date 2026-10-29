@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { StatusTag } from "@/components/relgov/tags";
 import { formatDateBR } from "@/lib/relgov/derived";
 import type { Pauta, Pendencia, ResumoSemanal } from "@/lib/types";
@@ -60,7 +62,9 @@ export function ResumoTab({
                 >
                   <div className="flex items-center gap-2.5">
                     <h3 className="font-display text-[15px] font-semibold text-relgov-navy">
-                      {pauta.titulo}
+                      <Link href={`/pautas/${pauta.$id}`} className="hover:underline">
+                        {pauta.titulo}
+                      </Link>
                     </h3>
                     <StatusTag status={pauta.status} />
                   </div>

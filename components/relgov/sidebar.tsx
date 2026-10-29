@@ -41,6 +41,9 @@ export function Sidebar({
     { href: "/pautas", label: "Pautas", count: pautasAtivasCount },
     { href: "/pendencias", label: "Pendências", badge: pendenciasVencidasCount },
     { href: "/tramitacao", label: "Tramitação" },
+    { href: "/deputados", label: "Deputados" },
+    { href: "/senadores", label: "Senadores" },
+    { href: "/ministerios", label: "Ministérios" },
     { href: "/relatorios", label: "Relatórios" },
     { href: "/usuarios", label: "Usuários", adminOnly: true },
   ];
@@ -88,7 +91,11 @@ export function Sidebar({
                   </span>
                 )}
                 {typeof item.badge === "number" && item.badge > 0 && (
-                  <span className="rounded-[9px] bg-[#b3382c] px-1.5 py-0.5 font-mono text-[10px] font-semibold text-white">
+                  <span
+                    title={`${item.badge} ${item.badge === 1 ? "vencida" : "vencidas"}`}
+                    aria-label={`${item.badge} ${item.badge === 1 ? "vencida" : "vencidas"}`}
+                    className="rounded-[9px] bg-[#b3382c] px-1.5 py-0.5 font-mono text-[10px] font-semibold text-white"
+                  >
                     {item.badge}
                   </span>
                 )}

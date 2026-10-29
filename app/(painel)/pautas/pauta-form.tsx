@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 
 import { PrimaryButton, SecondaryLinkButton } from "@/components/relgov/buttons";
+import { EIXOS_MAE, STATUS_PADRAO, STATUS_PAUTA, eixoMae, subeixoDe } from "@/lib/relgov/taxonomia";
 import type { Pauta } from "@/lib/types";
 import type { PautaFormState } from "./actions";
 
@@ -25,6 +26,7 @@ export function PautaForm({
   showEncaminhamentos,
 }: PautaFormProps) {
   const [state, formAction, pending] = useActionState(action, {});
+  const eixoAtual = pauta ? eixoMae(pauta.eixo) : undefined;
 
   return (
     <form action={formAction} className="flex max-w-[720px] flex-col gap-4">
@@ -36,7 +38,24 @@ export function PautaForm({
 
       <Field label="Título" name="titulo" defaultValue={pauta?.titulo} />
       <div className="grid grid-cols-2 gap-4">
-        <Field label="Eixo" name="eixo" defaultValue={pauta?.eixo} />
+        <div>
+          <label className="relgov-label block text-[10px]">Eixo</label>
+          <select
+            name="eixoMae"
+            required
+            defaultValue={eixoAtual && EIXOS_MAE.includes(eixoAtual) ? eixoAtual : ""}
+            className={inputClass}
+          >
+            <option value="" disabled>
+              Selecione…
+            </option>
+            {EIXOS_MAE.map((eixo) => (
+              <option key={eixo} value={eixo}>
+                {eixo}
+              </option>
+            ))}
+          </select>
+        </div>
         <div>
           <label className="relgov-label block text-[10px]">Prioridade</label>
           <select
@@ -50,6 +69,12 @@ export function PautaForm({
           </select>
         </div>
       </div>
+      <Field
+        label="Subeixo (opcional)"
+        name="subeixo"
+        defaultValue={pauta ? subeixoDe(pauta.eixo) : ""}
+        required={false}
+      />
       <TextAreaField label="Atuação" name="atuacao" defaultValue={pauta?.atuacao} />
       <div className="grid grid-cols-2 gap-4">
         <TextAreaField label="Contexto" name="contexto" defaultValue={pauta?.contexto} />
@@ -59,8 +84,78 @@ export function PautaForm({
           defaultValue={pauta?.situacaoAtual}
         />
       </div>
+      <div className="rounded-lg border border-relgov-border bg-relgov-surface p-4">
+        <p className="text-[11px] font-semibold uppercase tracking-wide text-relgov-gold">
+          Identificação da Proposição
+        </p>
+        <div className="mt-2.5 grid grid-cols-2 gap-4">
+          <Field
+            label="Autor"
+            name="autor"
+            defaultValue={pauta?.autor ?? ""}
+            required={false}
+          />
+          <Field
+            label="Apresentação"
+            name="dataApresentacao"
+            type="date"
+            defaultValue={pauta?.dataApresentacao ?? ""}
+            required={false}
+          />
+        </div>
+        <div className="mt-4">
+          <TextAreaField
+            label="Ementa"
+            name="ementa"
+            defaultValue={pauta?.ementa ?? ""}
+            required={false}
+          />
+        </div>
+      </div>
+
+      <Field
+        label="Data da última movimentação (em tramitação)"
+        name="dataUltimaMovimentacao"
+        type="date"
+        defaultValue={pauta?.dataUltimaMovimentacao ?? ""}
+        required={false}
+      />
+
+      <div>
+        <label className="relgov-label block text-[10px]">Incluir em Tramitação?</label>
+        <select
+          name="incluirTramitacao"
+          defaultValue={pauta ? String(pauta.incluirTramitacao) : "false"}
+          className={inputClass}
+        >
+          <option value="true">Sim — mover para Tramitação e incluir no monitoramento (sincronizar)</option>
+          <option value="false">Não — manter somente em Pauta</option>
+        </select>
+      </div>
+
       <Field label="Interlocutores" name="interlocutores" defaultValue={pauta?.interlocutores} />
-      <Field label="Status" name="status" defaultValue={pauta?.status} />
+      <div>
+        <label className="relgov-label block text-[10px]">Status</label>
+        <select
+          name="status"
+          required
+          defaultValue={pauta?.status ?? STATUS_PADRAO}
+          className={inputClass}
+        >
+          {/* Pauta antiga com status fora da lista: mantém o valor até ser reclassificada. */}
+          {pauta && !(STATUS_PAUTA as readonly string[]).includes(pauta.status) && (
+            <option value={pauta.status}>{pauta.status} (antigo — reclassifique)</option>
+          )}
+          {STATUS_PAUTA.map((status) => (
+            <option key={status} value={status}>
+              {status}
+            </option>
+          ))}
+        </select>
+        <p className="mt-1 text-[11.5px] text-relgov-muted">
+          Ao mudar o status, atualize também a “Situação atual”.
+        </p>
+      </div>
       <Field
         label="Fonte / referência"
         name="fonteReferencia"

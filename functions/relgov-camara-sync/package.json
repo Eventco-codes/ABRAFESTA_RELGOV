@@ -1,0 +1,10 @@
+{
+  "name": "relgov-camara-sync-fn",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Appwrite Function agendada — sincroniza dados da Câmara dos Deputados no banco relgov",
+  "main": "src/main.mjs",
+  "dependencies": {
+    "node-appwrite": "^28.0.0"
+  }
+}

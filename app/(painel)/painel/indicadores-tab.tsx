@@ -7,7 +7,7 @@ import type { Pendencia } from "@/lib/types";
 interface IndicadoresTabProps {
   kpis: {
     pautasAtivas: number;
-    pautasNovas2026: number;
+    pautasRecentes: number;
     prioridadeAlta: number;
     percentualAlta: number;
     pendenciasAbertas: number;
@@ -33,18 +33,26 @@ export function IndicadoresTab({
   return (
     <div className="px-7 py-[22px]">
       <div className="grid grid-cols-2 gap-3.5 md:grid-cols-4">
-        <KpiCard label="Pautas ativas" valor={kpis.pautasAtivas} nota={`${kpis.pautasNovas2026} novas em 2026`} />
         <KpiCard
+          href="/pautas?ativas=ativas"
+          label="Pautas ativas"
+          valor={kpis.pautasAtivas}
+          nota={`${kpis.pautasRecentes} cadastradas nos últimos 30 dias`}
+        />
+        <KpiCard
+          href="/pautas?prioridade=Alta"
           label="Prioridade alta"
           valor={kpis.prioridadeAlta}
           nota={`${kpis.percentualAlta}% da carteira`}
         />
         <KpiCard
+          href="/pendencias?filtro=abertas"
           label="Pendências abertas"
           valor={kpis.pendenciasAbertas}
           nota={`${kpis.pendenciasExternas} externas, ${kpis.pendenciasInternas} internas`}
         />
         <KpiCard
+          href="/pendencias?filtro=vencidas"
           label="Prazos vencidos"
           valor={kpis.prazosVencidos}
           nota="requer atenção"
@@ -58,7 +66,7 @@ export function IndicadoresTab({
           <div className="mt-3 flex flex-col gap-2.5">
             {distribuicaoEixo.map((item, index) => (
               <div key={item.eixo} className="flex items-center gap-2.5">
-                <span className="w-[150px] shrink-0 text-[12.5px] text-relgov-tag-blue-text">
+                <span className="w-[190px] shrink-0 text-[12.5px] text-relgov-tag-blue-text">
                   {item.eixo}
                 </span>
                 <span className="h-[15px] flex-1 overflow-hidden rounded-[4px] bg-relgov-divider">
@@ -125,19 +133,22 @@ export function IndicadoresTab({
 }
 
 function KpiCard({
+  href,
   label,
   valor,
   nota,
   danger,
 }: {
+  href: string;
   label: string;
   valor: number;
   nota: string;
   danger?: boolean;
 }) {
   return (
-    <div
-      className={`rounded-[9px] border bg-relgov-surface p-4 ${danger ? "border-relgov-danger" : "border-relgov-border"}`}
+    <Link
+      href={href}
+      className={`rounded-[9px] border bg-relgov-surface p-4 transition-colors hover:bg-relgov-surface-subtle-2 ${danger ? "border-relgov-danger hover:border-relgov-danger" : "border-relgov-border hover:border-relgov-navy-light"}`}
     >
       <p className={`relgov-label text-[10px] ${danger ? "text-relgov-danger" : ""}`}>{label}</p>
       <p
@@ -148,6 +159,6 @@ function KpiCard({
       <p className={`mt-0.5 text-[11.5px] ${danger ? "text-relgov-danger" : "text-relgov-muted"}`}>
         {nota}
       </p>
-    </div>
+    </Link>
   );
 }

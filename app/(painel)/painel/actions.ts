@@ -6,44 +6,16 @@ import { ID, Query } from "node-appwrite";
 import { requireRole, requireSession } from "@/lib/auth";
 import { createAdminClient, createSessionClient } from "@/lib/appwrite/server";
 import { APPWRITE_DATABASE_ID, TABLES, hasRelgovAccess } from "@/lib/appwrite/constants";
-import {
-  getResumoSemanalPorSemana,
-  listMovimentacoesRecentes,
-  listPautas,
-  listPendencias,
-} from "@/lib/relgov/data";
-import { pautasAtivas, pendenciasAbertas, pendenciasVencidas, semanaCorrente } from "@/lib/relgov/derived";
+import { listMovimentacoesRecentes, listPautas, listPendencias } from "@/lib/relgov/data";
+import { pautasAtivas, pendenciasAbertas, pendenciasVencidas } from "@/lib/relgov/derived";
 import { gerarResumoAutomatico, movimentacoesUltimos7Dias } from "@/lib/relgov/resumo";
+import { garantirResumoDaSemana } from "@/lib/relgov/resumo-semanal";
 import { renderWeeklyEmailHtml } from "@/lib/relgov/email-template";
-import type { ResumoSemanal } from "@/lib/types";
 
 export async function setPainelTab(tab: "resumo" | "indicadores") {
   const { sessionSecret } = await requireSession();
   const { account } = createSessionClient(sessionSecret);
   await account.updatePrefs({ prefs: { ultimaAbaPainel: tab } });
-}
-
-async function garantirResumoDaSemana(
-  tablesDB: ReturnType<typeof createSessionClient>["tablesDB"]
-): Promise<ResumoSemanal> {
-  const { inicio, fim } = semanaCorrente();
-  const existente = await getResumoSemanalPorSemana(tablesDB, inicio);
-  if (existente) return existente;
-
-  const [pautas, pendencias, movimentacoes] = await Promise.all([
-    listPautas(tablesDB),
-    listPendencias(tablesDB),
-    listMovimentacoesRecentes(tablesDB),
-  ]);
-  const recentes = movimentacoesUltimos7Dias(movimentacoes);
-  const { manchete, lide } = gerarResumoAutomatico(pautas, pendencias, recentes);
-
-  return tablesDB.createRow<ResumoSemanal>({
-    databaseId: APPWRITE_DATABASE_ID,
-    tableId: TABLES.resumosSemanais,
-    rowId: ID.unique(),
-    data: { semanaInicio: inicio, semanaFim: fim, manchete, lide },
-  });
 }
 
 /** Botão "Rodar monitoramento" — sem scraping real; garante o resumo da semana e recalcula números derivados. */
