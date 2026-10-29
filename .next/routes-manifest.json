@@ -14,7 +14,42 @@
       "regex": "^(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))/$"
     }
   ],
-  "headers": [],
+  "headers": [
+    {
+      "source": "/:path*",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=()"
+        },
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=31536000"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "frame-ancestors 'none'; base-uri 'self'; object-src 'none'"
+        }
+      ],
+      "regex": "^(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))?(?:/)?$"
+    }
+  ],
   "onMatchHeaders": [],
   "rewrites": {
     "beforeFiles": [],
@@ -101,6 +136,12 @@
       "regex": "^/api/auth/google/callback(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/api/auth/google/callback(?:/)?$"
+    },
+    {
+      "page": "/api/monitoramento/semanal",
+      "regex": "^/api/monitoramento/semanal(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/monitoramento/semanal(?:/)?$"
     },
     {
       "page": "/api/relatorios/pdf",
@@ -197,6 +238,12 @@
       "regex": "^/relatorios(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/relatorios(?:/)?$"
+    },
+    {
+      "page": "/robots.txt",
+      "regex": "^/robots\\.txt(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/robots\\.txt(?:/)?$"
     },
     {
       "page": "/senadores",

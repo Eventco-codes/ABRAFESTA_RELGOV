@@ -22,11 +22,13 @@
   "/api/anexos/[fileId]/route": "/api/anexos/[fileId]",
   "/api/auth/google/callback/route": "/api/auth/google/callback",
   "/api/auth/google/route": "/api/auth/google",
+  "/api/monitoramento/semanal/route": "/api/monitoramento/semanal",
   "/api/relatorios/pdf/pre-gerar/route": "/api/relatorios/pdf/pre-gerar",
   "/api/relatorios/pdf/route": "/api/relatorios/pdf",
   "/api/senado/sync/route": "/api/senado/sync",
   "/api/siorg/sync/route": "/api/siorg/sync",
   "/favicon.ico/route": "/favicon.ico",
   "/login/page": "/login",
-  "/page": "/"
+  "/page": "/",
+  "/robots.txt/route": "/robots.txt"
 }

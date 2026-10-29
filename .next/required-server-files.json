@@ -21,7 +21,7 @@
       "js"
     ],
     "instrumentationClientInject": [],
-    "poweredByHeader": true,
+    "poweredByHeader": false,
     "compress": true,
     "images": {
       "deviceSizes": [

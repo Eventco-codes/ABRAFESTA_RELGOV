@@ -1,3 +1,3 @@
-module.exports=[87621,a=>{"use strict";var b=a.i(51203),c=a.i(540);a.s([],8568),a.i(8568),a.s(["008bc0ca3e9b7a16d3aa9885b40f84d371ee72fad4",()=>b.logout,"4028a99e00b84345758abca3cd1fb6a6bf8cc4bc66",()=>c.restaurarPauta,"408bb1ae0fa92347af9495454cc223faef3a98446d",()=>c.excluirPautaAgora],87621)}];
+module.exports=[87621,a=>{"use strict";var b=a.i(51203),c=a.i(540);a.s([],8568),a.i(8568),a.s(["00c39c6115b528393daa624fdace71545188d9918e",()=>b.logout,"4065a63bd57a60c7cf5e489e0a7422fe281f3560e3",()=>c.excluirPautaAgora,"40bf71aba1a72c7752aaf8ac070e7f7e53287de277",()=>c.restaurarPauta],87621)}];
 
 //# sourceMappingURL=_next-internal_server_app_%28painel%29_pautas_lixeira_page_actions_1o2sr72.js.map

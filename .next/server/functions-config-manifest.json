@@ -10,6 +10,9 @@
         }
       ]
     },
+    "/api/monitoramento/semanal": {
+      "maxDuration": 300
+    },
     "/api/senado/sync": {
       "maxDuration": 300
     },

@@ -1,6 +1,6 @@
 {
   "node": {
-    "008bc0ca3e9b7a16d3aa9885b40f84d371ee72fad4": {
+    "00c39c6115b528393daa624fdace71545188d9918e": {
       "workers": {
         "app/(painel)/pautas/[id]/editar/page": {
           "moduleId": 67330,
@@ -11,7 +11,7 @@
       "exportedName": "logout",
       "filename": "app/login/actions.ts"
     },
-    "00cd9176151b581dcd9bb1b19a8cfdd2a620f7d215": {
+    "007bf4e3add70c19c8beff6284c038e71dcb06bfbc": {
       "workers": {
         "app/(painel)/pautas/[id]/editar/page": {
           "moduleId": 67330,
@@ -22,29 +22,7 @@
       "exportedName": "buscarPautasParaSelect",
       "filename": "app/(painel)/pautas/actions.ts"
     },
-    "4028a99e00b84345758abca3cd1fb6a6bf8cc4bc66": {
-      "workers": {
-        "app/(painel)/pautas/[id]/editar/page": {
-          "moduleId": 67330,
-          "async": false,
-          "codeHash": null
-        }
-      },
-      "exportedName": "restaurarPauta",
-      "filename": "app/(painel)/pautas/actions.ts"
-    },
-    "408bb1ae0fa92347af9495454cc223faef3a98446d": {
-      "workers": {
-        "app/(painel)/pautas/[id]/editar/page": {
-          "moduleId": 67330,
-          "async": false,
-          "codeHash": null
-        }
-      },
-      "exportedName": "excluirPautaAgora",
-      "filename": "app/(painel)/pautas/actions.ts"
-    },
-    "40a00ba7466435d4ef0de918addfc34b8d69eb0856": {
+    "405c3c429ef2ac1b0ad7cddcc352f14c5b606116a6": {
       "workers": {
         "app/(painel)/pautas/[id]/editar/page": {
           "moduleId": 67330,
@@ -55,7 +33,7 @@
       "exportedName": "excluirPauta",
       "filename": "app/(painel)/pautas/actions.ts"
     },
-    "60246ccb697b13739c743b21397b7091b052b1495c": {
+    "4065a63bd57a60c7cf5e489e0a7422fe281f3560e3": {
       "workers": {
         "app/(painel)/pautas/[id]/editar/page": {
           "moduleId": 67330,
@@ -63,10 +41,10 @@
           "codeHash": null
         }
       },
-      "exportedName": "createPauta",
+      "exportedName": "excluirPautaAgora",
       "filename": "app/(painel)/pautas/actions.ts"
     },
-    "602eba92b5c3ad981466bcb83252868d67b6d89bfe": {
+    "40bf71aba1a72c7752aaf8ac070e7f7e53287de277": {
       "workers": {
         "app/(painel)/pautas/[id]/editar/page": {
           "moduleId": 67330,
@@ -74,21 +52,10 @@
           "codeHash": null
         }
       },
-      "exportedName": "criarPautaRapida",
+      "exportedName": "restaurarPauta",
       "filename": "app/(painel)/pautas/actions.ts"
     },
-    "603a3954be55f940926f7c39cf7cb37e94591a0b04": {
-      "workers": {
-        "app/(painel)/pautas/[id]/editar/page": {
-          "moduleId": 67330,
-          "async": false,
-          "codeHash": null
-        }
-      },
-      "exportedName": "toggleAtivoPauta",
-      "filename": "app/(painel)/pautas/actions.ts"
-    },
-    "6042b68baab6cd5d58215958118a1bb5ec61e1b518": {
+    "6013a04be8ffef66b2d9ef09167886e8dc125cbc87": {
       "workers": {
         "app/(painel)/pautas/[id]/editar/page": {
           "moduleId": 67330,
@@ -99,7 +66,7 @@
       "exportedName": "registrarMovimentacaoComPauta",
       "filename": "app/(painel)/pautas/actions.ts"
     },
-    "608674a66156d2c5edf1e7f686df79b1900a064163": {
+    "6069302e4b02838f2f9e35b90253c2bd4d7a169e9a": {
       "workers": {
         "app/(painel)/pautas/[id]/editar/page": {
           "moduleId": 67330,
@@ -110,7 +77,40 @@
       "exportedName": "excluirAnexo",
       "filename": "app/(painel)/pautas/actions.ts"
     },
-    "7021b96f02a97ab01bb7271311e3d6fde83ebbed07": {
+    "6071d4180de7db43b22346591b8ac4800d0b04c82e": {
+      "workers": {
+        "app/(painel)/pautas/[id]/editar/page": {
+          "moduleId": 67330,
+          "async": false,
+          "codeHash": null
+        }
+      },
+      "exportedName": "toggleAtivoPauta",
+      "filename": "app/(painel)/pautas/actions.ts"
+    },
+    "6079cc90669fe8991de6e7ef72c0d6c546c503a017": {
+      "workers": {
+        "app/(painel)/pautas/[id]/editar/page": {
+          "moduleId": 67330,
+          "async": false,
+          "codeHash": null
+        }
+      },
+      "exportedName": "createPauta",
+      "filename": "app/(painel)/pautas/actions.ts"
+    },
+    "609bd0499a3a6651aeb94c775d3637b0e76bcdac76": {
+      "workers": {
+        "app/(painel)/pautas/[id]/editar/page": {
+          "moduleId": 67330,
+          "async": false,
+          "codeHash": null
+        }
+      },
+      "exportedName": "criarPautaRapida",
+      "filename": "app/(painel)/pautas/actions.ts"
+    },
+    "705c69681d971bd9f561e2c4401f5bbe973dc7c096": {
       "workers": {
         "app/(painel)/pautas/[id]/editar/page": {
           "moduleId": 67330,
@@ -121,7 +121,7 @@
       "exportedName": "registrarMovimentacao",
       "filename": "app/(painel)/pautas/actions.ts"
     },
-    "707150c1a0a50509e145195f4a7dbba2c677d94296": {
+    "70cbbd5e7d55125262b795d8cfeff750d22401c18c": {
       "workers": {
         "app/(painel)/pautas/[id]/editar/page": {
           "moduleId": 67330,
@@ -132,18 +132,7 @@
       "exportedName": "updatePauta",
       "filename": "app/(painel)/pautas/actions.ts"
     },
-    "707e4504356fc34ab4ea739a7b5e31505e3eba12c4": {
-      "workers": {
-        "app/(painel)/pautas/[id]/editar/page": {
-          "moduleId": 67330,
-          "async": false,
-          "codeHash": null
-        }
-      },
-      "exportedName": "toggleEncaminhamento",
-      "filename": "app/(painel)/pautas/actions.ts"
-    },
-    "70c5c0426b2e8a3b0fe0e12832af135fd47ae36fb1": {
+    "70d25559981d1e1c73e46dab9a489209fa359126a4": {
       "workers": {
         "app/(painel)/pautas/[id]/editar/page": {
           "moduleId": 67330,
@@ -154,7 +143,18 @@
       "exportedName": "uploadAnexoPauta",
       "filename": "app/(painel)/pautas/actions.ts"
     },
-    "7813300234c3672e02c55af3a9c6634cd21934d7d7": {
+    "70f270f8ba144caed4aedab3ea4efb4cc28d072dcc": {
+      "workers": {
+        "app/(painel)/pautas/[id]/editar/page": {
+          "moduleId": 67330,
+          "async": false,
+          "codeHash": null
+        }
+      },
+      "exportedName": "toggleEncaminhamento",
+      "filename": "app/(painel)/pautas/actions.ts"
+    },
+    "780e3510ff9a572e1ea27f1be2beceb387c19462e1": {
       "workers": {
         "app/(painel)/pautas/[id]/editar/page": {
           "moduleId": 67330,

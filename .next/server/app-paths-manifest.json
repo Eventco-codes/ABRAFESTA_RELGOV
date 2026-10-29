@@ -22,11 +22,13 @@
   "/api/anexos/[fileId]/route": "app/api/anexos/[fileId]/route.js",
   "/api/auth/google/callback/route": "app/api/auth/google/callback/route.js",
   "/api/auth/google/route": "app/api/auth/google/route.js",
+  "/api/monitoramento/semanal/route": "app/api/monitoramento/semanal/route.js",
   "/api/relatorios/pdf/pre-gerar/route": "app/api/relatorios/pdf/pre-gerar/route.js",
   "/api/relatorios/pdf/route": "app/api/relatorios/pdf/route.js",
   "/api/senado/sync/route": "app/api/senado/sync/route.js",
   "/api/siorg/sync/route": "app/api/siorg/sync/route.js",
   "/favicon.ico/route": "app/favicon.ico/route.js",
   "/login/page": "app/login/page.js",
-  "/page": "app/page.js"
+  "/page": "app/page.js",
+  "/robots.txt/route": "app/robots.txt/route.js"
 }

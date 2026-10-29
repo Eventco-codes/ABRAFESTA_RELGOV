@@ -1,6 +1,6 @@
 {
   "node": {
-    "008bc0ca3e9b7a16d3aa9885b40f84d371ee72fad4": {
+    "00c39c6115b528393daa624fdace71545188d9918e": {
       "workers": {
         "app/(painel)/usuarios/page": {
           "moduleId": 68509,
@@ -11,7 +11,7 @@
       "exportedName": "logout",
       "filename": "app/login/actions.ts"
     },
-    "60f0f7780aafbb0aeeee52cf882f878865252ab218": {
+    "60f800211ca49b210c1059a66001ebb0e9e399eb33": {
       "workers": {
         "app/(painel)/usuarios/page": {
           "moduleId": 68509,
@@ -22,7 +22,7 @@
       "exportedName": "convidarUsuario",
       "filename": "app/(painel)/usuarios/actions.ts"
     },
-    "6060d148199b8cb52183b08fcbd0a572e710cf0a01": {
+    "60d154c2bfa1491b6e5661edb7744ba0ea42dcd9cd": {
       "workers": {
         "app/(painel)/usuarios/page": {
           "moduleId": 68509,
@@ -33,7 +33,7 @@
       "exportedName": "alternarReceberAlertas",
       "filename": "app/(painel)/usuarios/actions.ts"
     },
-    "60e46b13116565b64449ae8b1de82f312beb39aebf": {
+    "60fedeed23c9adac002a1501fc636849ca9ce87e71": {
       "workers": {
         "app/(painel)/usuarios/page": {
           "moduleId": 68509,
@@ -44,7 +44,7 @@
       "exportedName": "alternarStatusUsuario",
       "filename": "app/(painel)/usuarios/actions.ts"
     },
-    "601ae32aa708bdc07b304bef1dc34d8b663332088d": {
+    "60a5318f6e6bf822cc94c28123f744d02f24ee770d": {
       "workers": {
         "app/(painel)/usuarios/page": {
           "moduleId": 68509,
