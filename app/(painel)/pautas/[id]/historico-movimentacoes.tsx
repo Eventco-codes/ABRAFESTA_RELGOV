@@ -8,6 +8,7 @@ import { formatDateBR } from "@/lib/relgov/derived";
 import { calcularMesclagem } from "@/lib/relgov/mesclar";
 import type { Movimentacao } from "@/lib/types";
 import { mesclarMovimentacoes } from "../actions";
+import { MovimentacaoItem } from "./movimentacao-item";
 
 const MARCADOR_ORIGEM: Record<string, string> = {
   VARREDURA_AUTOMATICA: "bg-relgov-gold",
@@ -17,11 +18,12 @@ const MARCADOR_ORIGEM: Record<string, string> = {
 export function HistoricoMovimentacoes({
   pautaId,
   movimentacoes,
-  podeMesclar,
+  podeEditar,
 }: {
   pautaId: string;
   movimentacoes: Movimentacao[];
-  podeMesclar: boolean;
+  /** Permite editar, excluir e mesclar registros (administrador e coordenador RelGov). */
+  podeEditar: boolean;
 }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -69,13 +71,27 @@ export function HistoricoMovimentacoes({
         {movimentacoes.length === 0 && (
           <p className="text-[12px] text-relgov-muted">Nenhuma movimentação registrada.</p>
         )}
-        {movimentacoes.map((mov, index) => (
-          <li key={mov.$id} className="relative">
-            <span
-              className={`absolute -left-[21px] top-1 h-2 w-2 rounded-full ${index === 0 ? "bg-relgov-gold" : MARCADOR_ORIGEM[mov.origem]}`}
-            />
-            <label className={mesclando ? "flex cursor-pointer items-start gap-2" : "block"}>
-              {mesclando && (
+        {movimentacoes.map((mov, index) => {
+          const marcadorClass = index === 0 ? "bg-relgov-gold" : MARCADOR_ORIGEM[mov.origem];
+
+          // Fora do modo de mesclagem: item com Editar/Excluir.
+          if (!mesclando) {
+            return (
+              <MovimentacaoItem
+                key={mov.$id}
+                pautaId={pautaId}
+                mov={{ $id: mov.$id, data: mov.data, titulo: mov.titulo, descricao: mov.descricao }}
+                dataFormatada={formatDateBR(mov.data)}
+                marcadorClass={marcadorClass}
+                podeEditar={podeEditar}
+              />
+            );
+          }
+
+          return (
+            <li key={mov.$id} className="relative">
+              <span className={`absolute -left-[21px] top-1 h-2 w-2 rounded-full ${marcadorClass}`} />
+              <label className="flex cursor-pointer items-start gap-2">
                 <input
                   type="checkbox"
                   checked={selecionados.has(mov.$id)}
@@ -84,24 +100,24 @@ export function HistoricoMovimentacoes({
                   className="mt-1 h-3.5 w-3.5 shrink-0 accent-relgov-navy"
                   aria-label={`Selecionar: ${mov.titulo}`}
                 />
-              )}
-              <span className="block min-w-0">
-                <span className="block font-mono text-[11px] text-relgov-muted">
-                  {formatDateBR(mov.data)}
+                <span className="block min-w-0">
+                  <span className="block font-mono text-[11px] text-relgov-muted">
+                    {formatDateBR(mov.data)}
+                  </span>
+                  <span className="block text-[12.5px] font-medium text-relgov-body">
+                    {mov.titulo}
+                  </span>
+                  <span className="block whitespace-pre-line text-[11.5px] text-relgov-muted">
+                    {mov.descricao}
+                  </span>
                 </span>
-                <span className="block text-[12.5px] font-medium text-relgov-body">
-                  {mov.titulo}
-                </span>
-                <span className="block whitespace-pre-line text-[11.5px] text-relgov-muted">
-                  {mov.descricao}
-                </span>
-              </span>
-            </label>
-          </li>
-        ))}
+              </label>
+            </li>
+          );
+        })}
       </ol>
 
-      {podeMesclar && movimentacoes.length >= 2 && !mesclando && (
+      {podeEditar && movimentacoes.length >= 2 && !mesclando && (
         <div className="mt-4">
           <SecondaryButton className="w-full" onClick={() => setMesclando(true)}>
             Mesclar registros

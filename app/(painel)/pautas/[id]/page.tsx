@@ -142,7 +142,7 @@ export default async function FichaPautaPage({
           <HistoricoMovimentacoes
             pautaId={pauta.$id}
             movimentacoes={movimentacoes}
-            podeMesclar={podeRegistrar}
+            podeEditar={podeRegistrar}
           />
 
           {podeRegistrar && (
