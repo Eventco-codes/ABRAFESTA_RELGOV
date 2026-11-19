@@ -10,6 +10,7 @@ import { getPauta, listEncaminhamentos, listMovimentacoes, listPendencias } from
 import { formatDateBR, isVencido } from "@/lib/relgov/derived";
 import { EncaminhamentoItem } from "./encaminhamento-item";
 import { MovimentacaoForm } from "./movimentacao-form";
+import { MovimentacaoItem } from "./movimentacao-item";
 import { ToggleAtivoButton } from "./toggle-ativo-button";
 
 const MARCADOR_ORIGEM: Record<string, string> = {
@@ -148,16 +149,14 @@ export default async function FichaPautaPage({
               <p className="text-[12px] text-relgov-muted">Nenhuma movimentação registrada.</p>
             )}
             {movimentacoes.map((mov, index) => (
-              <li key={mov.$id} className="relative">
-                <span
-                  className={`absolute -left-[21px] top-1 h-2 w-2 rounded-full ${index === 0 ? "bg-relgov-gold" : MARCADOR_ORIGEM[mov.origem]}`}
-                />
-                <p className="font-mono text-[11px] text-relgov-muted">
-                  {formatDateBR(mov.data)}
-                </p>
-                <p className="text-[12.5px] font-medium text-relgov-body">{mov.titulo}</p>
-                <p className="text-[11.5px] text-relgov-muted">{mov.descricao}</p>
-              </li>
+              <MovimentacaoItem
+                key={mov.$id}
+                pautaId={pauta.$id}
+                mov={{ $id: mov.$id, data: mov.data, titulo: mov.titulo, descricao: mov.descricao }}
+                dataFormatada={formatDateBR(mov.data)}
+                marcadorClass={index === 0 ? "bg-relgov-gold" : MARCADOR_ORIGEM[mov.origem]}
+                podeEditar={podeRegistrar}
+              />
             ))}
           </ol>
 

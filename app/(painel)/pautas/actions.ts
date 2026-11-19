@@ -187,3 +187,47 @@ export async function buscarPautasParaSelect() {
   });
   return rows.map((row) => ({ $id: row.$id, titulo: row.titulo }));
 }
+
+const edicaoMovimentacaoSchema = movimentacaoSchema.extend({
+  data: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Data inválida."),
+});
+
+export async function editarMovimentacao(
+  pautaId: string,
+  movimentacaoId: string,
+  _prev: MovimentacaoFormState,
+  formData: FormData
+): Promise<MovimentacaoFormState> {
+  const { tablesDB } = await requireRole("administrador", "coordenadorrelgov");
+  const parsed = edicaoMovimentacaoSchema.safeParse(Object.fromEntries(formData));
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "Dados inválidos." };
+  }
+
+  await tablesDB.updateRow({
+    databaseId: APPWRITE_DATABASE_ID,
+    tableId: TABLES.movimentacoes,
+    rowId: movimentacaoId,
+    data: {
+      titulo: parsed.data.titulo,
+      descricao: parsed.data.descricao,
+      // meio-dia em Brasília evita troca de dia por fuso
+      data: new Date(`${parsed.data.data}T12:00:00-03:00`).toISOString(),
+    },
+  });
+
+  revalidatePath(`/pautas/${pautaId}`);
+  revalidatePath("/tramitacao");
+  return {};
+}
+
+export async function excluirMovimentacao(pautaId: string, movimentacaoId: string) {
+  const { tablesDB } = await requireRole("administrador", "coordenadorrelgov");
+  await tablesDB.deleteRow({
+    databaseId: APPWRITE_DATABASE_ID,
+    tableId: TABLES.movimentacoes,
+    rowId: movimentacaoId,
+  });
+  revalidatePath(`/pautas/${pautaId}`);
+  revalidatePath("/tramitacao");
+}
