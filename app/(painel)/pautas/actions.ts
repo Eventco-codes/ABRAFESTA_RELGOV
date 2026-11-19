@@ -7,7 +7,8 @@ import { z } from "zod";
 
 import { APPWRITE_DATABASE_ID, TABLES } from "@/lib/appwrite/constants";
 import { requireRole } from "@/lib/auth";
-import type { Pauta } from "@/lib/types";
+import { calcularMesclagem, MAX_REGISTROS_POR_MESCLAGEM } from "@/lib/relgov/mesclar";
+import type { Movimentacao, Pauta } from "@/lib/types";
 
 const pautaSchema = z.object({
   titulo: z.string().min(3, "Informe o título."),
@@ -176,6 +177,81 @@ export async function registrarMovimentacao(
 
   revalidatePath(`/pautas/${pautaId}`);
   return {};
+}
+
+export interface MesclarMovimentacoesState {
+  error?: string;
+  mesclados?: number;
+}
+
+/**
+ * Une movimentações da mesma pauta em um único registro (o mais recente).
+ * Ordem pensada para nunca perder conteúdo: primeiro grava o texto unido no registro
+ * que permanece; só depois exclui os demais. Se uma exclusão falhar, o conteúdo já está
+ * preservado (no máximo fica duplicado) e repetir a mesclagem remove a sobra.
+ */
+export async function mesclarMovimentacoes(
+  pautaId: string,
+  movimentacaoIds: string[]
+): Promise<MesclarMovimentacoesState> {
+  const { tablesDB } = await requireRole("administrador", "coordenadorrelgov");
+
+  const ids = [...new Set(movimentacaoIds)];
+  if (ids.length < 2) return { error: "Selecione ao menos 2 registros para mesclar." };
+  if (ids.length > MAX_REGISTROS_POR_MESCLAGEM) {
+    return { error: `Selecione no máximo ${MAX_REGISTROS_POR_MESCLAGEM} registros por mesclagem.` };
+  }
+
+  // Sempre relê do banco: o texto vem do servidor, nunca do cliente.
+  const { rows } = await tablesDB.listRows<Movimentacao>({
+    databaseId: APPWRITE_DATABASE_ID,
+    tableId: TABLES.movimentacoes,
+    queries: [
+      Query.equal("pautaId", pautaId),
+      Query.equal("$id", ids),
+      Query.limit(MAX_REGISTROS_POR_MESCLAGEM),
+    ],
+  });
+  if (rows.length !== ids.length) {
+    return {
+      error:
+        "Alguns registros não existem mais ou não pertencem a esta pauta. Atualize a página e tente novamente.",
+    };
+  }
+
+  const mesclagem = calcularMesclagem(rows);
+  if (!mesclagem.ok) return { error: mesclagem.error };
+
+  await tablesDB.updateRow({
+    databaseId: APPWRITE_DATABASE_ID,
+    tableId: TABLES.movimentacoes,
+    rowId: mesclagem.principalId,
+    data: { descricao: mesclagem.descricao, criadoPorNome: mesclagem.criadoPorNome },
+  });
+
+  const falhas: string[] = [];
+  for (const rowId of mesclagem.excluirIds) {
+    try {
+      await tablesDB.deleteRow({
+        databaseId: APPWRITE_DATABASE_ID,
+        tableId: TABLES.movimentacoes,
+        rowId,
+      });
+    } catch {
+      falhas.push(rowId);
+    }
+  }
+
+  revalidatePath(`/pautas/${pautaId}`);
+  revalidatePath("/tramitacao");
+  revalidatePath("/painel");
+
+  if (falhas.length > 0) {
+    return {
+      error: `O conteúdo foi unido, mas ${falhas.length} registro(s) antigo(s) não puderam ser excluídos. Nada foi perdido; repita a mesclagem para remover a sobra.`,
+    };
+  }
+  return { mesclados: ids.length };
 }
 
 export async function buscarPautasParaSelect() {

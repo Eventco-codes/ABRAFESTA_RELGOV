@@ -9,13 +9,9 @@ import { canManagePautas, canRegistrarMovimentacao } from "@/lib/permissions";
 import { getPauta, listEncaminhamentos, listMovimentacoes, listPendencias } from "@/lib/relgov/data";
 import { formatDateBR, isVencido } from "@/lib/relgov/derived";
 import { EncaminhamentoItem } from "./encaminhamento-item";
+import { HistoricoMovimentacoes } from "./historico-movimentacoes";
 import { MovimentacaoForm } from "./movimentacao-form";
 import { ToggleAtivoButton } from "./toggle-ativo-button";
-
-const MARCADOR_ORIGEM: Record<string, string> = {
-  VARREDURA_AUTOMATICA: "bg-relgov-gold",
-  REGISTRO_MANUAL: "bg-relgov-navy",
-};
 
 export default async function FichaPautaPage({
   params,
@@ -143,23 +139,11 @@ export default async function FichaPautaPage({
 
         <aside className="border-t border-relgov-border bg-relgov-surface px-5 py-[22px] lg:border-l lg:border-t-0">
           <p className="relgov-label text-[10px]">Histórico de monitoramento</p>
-          <ol className="mt-3 flex flex-col gap-[18px] border-l border-relgov-border pl-4">
-            {movimentacoes.length === 0 && (
-              <p className="text-[12px] text-relgov-muted">Nenhuma movimentação registrada.</p>
-            )}
-            {movimentacoes.map((mov, index) => (
-              <li key={mov.$id} className="relative">
-                <span
-                  className={`absolute -left-[21px] top-1 h-2 w-2 rounded-full ${index === 0 ? "bg-relgov-gold" : MARCADOR_ORIGEM[mov.origem]}`}
-                />
-                <p className="font-mono text-[11px] text-relgov-muted">
-                  {formatDateBR(mov.data)}
-                </p>
-                <p className="text-[12.5px] font-medium text-relgov-body">{mov.titulo}</p>
-                <p className="text-[11.5px] text-relgov-muted">{mov.descricao}</p>
-              </li>
-            ))}
-          </ol>
+          <HistoricoMovimentacoes
+            pautaId={pauta.$id}
+            movimentacoes={movimentacoes}
+            podeMesclar={podeRegistrar}
+          />
 
           {podeRegistrar && (
             <div className="mt-4">
