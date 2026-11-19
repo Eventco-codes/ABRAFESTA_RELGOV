@@ -30,10 +30,21 @@ export default async function EmailPreviewPage({
         actions={<SecondaryLinkButton href="/painel">Voltar ao painel</SecondaryLinkButton>}
       />
       <div className="px-7 py-6">
-        <p className="mb-4 max-w-[640px] rounded-md border border-relgov-warning-bg bg-relgov-warning-bg px-3.5 py-2.5 text-[12.5px] text-relgov-warning-text">
-          Rascunho salvo em <strong>email_logs</strong> (status RASCUNHO) — o envio real
-          ainda não está configurado neste MVP. Ver README para plugar um provedor de
-          e-mail.
+        <p
+          className={`mb-4 max-w-[640px] rounded-md border px-3.5 py-2.5 text-[12.5px] ${
+            emailLog.status === "ENVIADO"
+              ? "border-relgov-success-bg bg-relgov-success-bg text-relgov-success"
+              : emailLog.status === "FALHA"
+                ? "border-relgov-danger-bg bg-relgov-danger-bg text-relgov-danger"
+                : "border-relgov-warning-bg bg-relgov-warning-bg text-relgov-warning-text"
+          }`}
+        >
+          {emailLog.status === "ENVIADO" &&
+            "E-mail enviado com sucesso aos destinatários acima via Resend."}
+          {emailLog.status === "FALHA" &&
+            "Falha ao enviar o e-mail. Confira RESEND_API_KEY/RESEND_FROM_EMAIL no ambiente e os logs do servidor."}
+          {emailLog.status === "RASCUNHO" &&
+            "Rascunho salvo em email_logs — envio ainda não foi disparado."}
         </p>
         <iframe
           title="Prévia do e-mail semanal"

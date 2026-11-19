@@ -38,7 +38,11 @@ NEXT_PUBLIC_APPWRITE_PROJECT_ID=
 APPWRITE_API_KEY=
 APPWRITE_DATABASE_ID=relgov
 NEXT_PUBLIC_APP_URL=http://localhost:3000
+RESEND_API_KEY=
+RESEND_FROM_EMAIL=
 ```
+
+`RESEND_API_KEY`/`RESEND_FROM_EMAIL` são usados pelo botão "Enviar resumo aos gestores" (ver seção "Envio do e-mail semanal" abaixo). Crie uma conta em [resend.com](https://resend.com), verifique o domínio de envio e gere uma API key.
 
 ## 4. Provisionar o schema e popular dados
 
@@ -103,10 +107,15 @@ O app é um Next.js padrão (sem `vercel.json`, sem configuração especial) —
 
 Aplicado em três camadas: permissões nativas por Label em cada tabela do Appwrite (`scripts/setup-appwrite.mjs`), `proxy.ts` (guarda rápida por presença de cookie), e `requireRole()`/`requireSession()` (`lib/auth.ts`) em cada página/rota — que valida a sessão de verdade contra o Appwrite a cada acesso.
 
+## Envio do e-mail semanal
+
+"Enviar resumo aos gestores" gera o HTML (mesmo template da tela 1h do handoff), grava um `EmailLog` em `email_logs` e envia de verdade via **Resend** (`lib/relgov/email-send.ts`) para todos os usuários com acesso ao RelGov (`administrador`/`coordenadorrelgov`) que não desligaram `receberAlertas` nas preferências. O status do log é atualizado para `ENVIADO` ou `FALHA` conforme o resultado, visível na prévia em `/painel/email-preview/[id]`.
+
+Requer `RESEND_API_KEY` e `RESEND_FROM_EMAIL` configurados (ver seção "Variáveis de ambiente"). Sem eles, o envio falha e o log fica com status `FALHA` — o rascunho continua salvo normalmente.
+
 ## O que fica pendente (fora do escopo deste MVP)
 
 - **Varredura automática dos links oficiais**: o handoff de design descreve uma rotina que buscaria o andamento de cada pauta a partir do `linkOficial`. Isso é scraping heterogêneo por órgão (Câmara, MTE, Receita…) e não foi implementado — captura de novidades é sempre **registro manual** (botão "+ Registrar movimentação" na ficha da pauta). O botão "Rodar monitoramento" e a Appwrite Function `functions/weekly-summary` fazem a parte que é real: recalculam números da semana e garantem o resumo semanal.
-- **Envio real do e-mail semanal**: "Enviar resumo aos gestores" gera o HTML (mesmo template da tela 1h do handoff) e grava um rascunho em `email_logs` (status `RASCUNHO`) com uma prévia em `/painel/email-preview/[id]` — não dispara e-mail de verdade. Ponto único de integração: `lib/relgov/email-template.ts` (render) + `app/(painel)/painel/actions.ts` (`enviarResumoAosGestores`) — plugar Resend/SMTP ali quando houver decisão de provedor.
 
 ## Appwrite Function agendada
 
